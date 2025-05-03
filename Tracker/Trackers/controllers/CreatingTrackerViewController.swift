@@ -23,7 +23,7 @@ final class CreatingTrackerViewController: UIViewController, UINavigationControl
     
     private let irrgularButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Неругулярное события", for: .normal)
+        button.setTitle("Нерегулярное событие", for: .normal)
         return button
     }()
     
