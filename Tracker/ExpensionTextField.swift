@@ -6,6 +6,7 @@
 //
 
 import UIKit
+
 extension UITextField {
     func setIndents(){
         let view = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: 0))

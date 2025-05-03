@@ -125,6 +125,7 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
     }
+    
     private func setUpPlaceholder(){
         imagePlaceholder.widthAnchor.constraint(equalToConstant: 80).isActive = true
         imagePlaceholder.heightAnchor.constraint(equalToConstant: 80).isActive = true
@@ -138,6 +139,7 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         stackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16).isActive = true
         stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
     }
+    
     private func setUI(){
         view.backgroundColor = .whiteYP
         setUpPlaceholder()
@@ -145,6 +147,7 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         setCollectionView()
         collectionView.isHidden = currentcCategories.count == 0
     }
+    
     private func setCurrentDayCollections(){
         currentcCategories = []
         var x1=0
@@ -185,6 +188,7 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         collectionView.reloadData()
         collectionView.isHidden = x1 == 0
     }
+    
     private func configCell(cell: CollectionViewCellForTrackers,indexPath: IndexPath){
         let id = currentcCategories[indexPath.section].tracker[indexPath.row].id
         cell.emojiLabel.text = currentcCategories[indexPath.section].tracker[indexPath.row].emoji
@@ -198,6 +202,7 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         cell.setDays(number: number)
         cell.delegate = self
     }
+    
     private func isComplete(id:UUID) -> Bool {
         for i in 0..<completedTrackers.count {
             if completedTrackers[i].id == id && idSameDate(date: completedTrackers[i].date){
@@ -206,6 +211,7 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         }
         return false
     }
+    
     private func idSameDate(date: Date) -> Bool {
         return Calendar.current.isDate(date, inSameDayAs: currentDate)
     }
@@ -220,6 +226,7 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         return count
     }
 }
+
 extension TrackersViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if section == 0 && currentcCategories.count == 0 {
@@ -243,6 +250,7 @@ extension TrackersViewController: UICollectionViewDataSource {
         }
         return UICollectionReusableView()
     }
+    
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return currentcCategories.count
     }
