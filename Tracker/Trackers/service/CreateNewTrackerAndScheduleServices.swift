@@ -7,11 +7,12 @@
 
 import Foundation
 
-final class HabitAndScheduleServices {
-    static let shared = HabitAndScheduleServices()
+final class CreateNewTrackerAndScheduleServices {
+    static let shared = CreateNewTrackerAndScheduleServices()
     
     private init() {}
-    
+    var isWarning : Bool = false
+    var habitOrEvent : String = ""
     let abbreviationOfNamesDays = ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"]
     
     let numberOfDaysInt = [2,3,4,5,6,7,1]
@@ -37,7 +38,15 @@ final class HabitAndScheduleServices {
         numberOfDaysForDateInt = sortNumberOfDays
         schdule = sortArray
     }
-    
+    func habitOrEventName(_ name: String) {
+        habitOrEvent = name
+    }
+    func setWarning(){
+        isWarning = true
+    }
+    func deletedWarning(){
+        isWarning = false
+    }
     func addToSchdule(numberDays: Int) {
         schdule.append(abbreviationOfNamesDays[numberDays])
         numberOfDaysForDateInt.append(numberOfDaysInt[numberDays])
