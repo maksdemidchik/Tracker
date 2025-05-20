@@ -6,6 +6,9 @@
 //
 
 import UIKit
+protocol AddHabitDelegate: AnyObject {
+    func setScheduleText()
+}
 
 final class ScheduleViewController: UIViewController, UITableViewDelegate  {
     weak var delegate: AddHabitDelegate?
@@ -42,7 +45,7 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate  {
     
     private let weekDays = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
     
-    private let service = HabitAndScheduleServices.shared
+    private let service = CreateNewTrackerAndScheduleServices.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()

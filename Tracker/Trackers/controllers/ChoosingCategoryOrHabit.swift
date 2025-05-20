@@ -12,7 +12,8 @@ protocol CreatingTrackerViewControllerDelegate : AnyObject {
     func currentDateInt() -> Int
 }
 
-final class CreatingTrackerViewController: UIViewController, UINavigationControllerDelegate {
+final class ChoosingCategoryOrHabit: UIViewController, UINavigationControllerDelegate {
+    
     weak var delegate: TrackersViewControllerDelegate?
     
     private let habbitButton: UIButton = {
@@ -26,24 +27,25 @@ final class CreatingTrackerViewController: UIViewController, UINavigationControl
         button.setTitle("Нерегулярное событие", for: .normal)
         return button
     }()
-    
+    private let shared = CreateNewTrackerAndScheduleServices.shared
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
     }
     
     @objc func habitAction(){
-        let vc = AddHabitViewController()
-        vc.delegate = self
-        self.navigationController?.pushViewController(vc, animated: true)
+        showNextController(name: "Привычка")
     }
     
     @objc func action(){
-        let vc = AddNewIrregularEventViewController()
+        showNextController(name: "Нерегулярное событие")
+    }
+    private func showNextController(name: String){
+        shared.habitOrEventName(name)
+        let vc = CreateNewTrackerViewController()
         vc.delegate = self
         self.navigationController?.pushViewController(vc, animated: true)
     }
-    
     private func setHabbitButton(){
         habbitButton.addTarget(self, action: #selector(habitAction), for: .touchDown)
         generalAtThePositionOfTheButtons(button: habbitButton, float: 281)
@@ -76,7 +78,7 @@ final class CreatingTrackerViewController: UIViewController, UINavigationControl
     }
 }
 
-extension CreatingTrackerViewController: CreatingTrackerViewControllerDelegate {
+extension ChoosingCategoryOrHabit: CreatingTrackerViewControllerDelegate {
     func currentDateInt() -> Int {
         guard let dateInt = self.delegate?.returnSelectedDayInt() else {
             return 0

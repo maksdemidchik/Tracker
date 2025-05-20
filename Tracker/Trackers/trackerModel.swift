@@ -13,6 +13,7 @@ struct Tracker{
     let name : String
     let emoji : String
     let schedule :  Array<Int>
+    let dateOfAddition : Date
 }
 
 struct TrackerCategory{

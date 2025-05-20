@@ -19,6 +19,14 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
     
     private var name = ""
     
+    private var categories: [TrackerCategory] = []
+    
+    private var currentcCategories: [TrackerCategory] = []
+    
+    private var completedTrackers: [TrackerRecord] = []
+    
+    private var searchBarText = ""
+    
     private let searchBar: UISearchController = {
         let searchBar = UISearchController()
         return searchBar
@@ -61,30 +69,28 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
     
     private var stackView = UIStackView()
     
-    lazy var selectedDayInt: Int = {
+    private lazy var selectedDayInt: Int = {
         let weekdayInt = Calendar.current.component(.weekday, from: dataPicker.date)
         return weekdayInt
     }()
     
-    var tracker : Tracker?
+    private lazy var trackerStore = TrackerStore()
     
-    var trackers: [[Tracker]] = []
+    private lazy var trackerCategoryStore = TrackerCategoryStore()
     
-    var categories: [TrackerCategory] = []
-    
-    var currentcCategories: [TrackerCategory] = []
-    
-    var completedTrackers: [TrackerRecord] = []
-    
-    var searchBarText = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
+        categories = trackerCategoryStore.getTracker()
+        trackerStore.delegate = self
+        setCurrentDayCollections()
+        completedTrackers = trackerStore.getComletedTrackers()
+        trackerCategoryStore.delegate = self
     }
     
     @objc func plusButtonAction(){
-        let vc = CreatingTrackerViewController()
+        let vc = ChoosingCategoryOrHabit()
         vc.delegate = self
         let vc1 = UINavigationController(rootViewController: vc)
         present(vc1,animated: true)
@@ -168,7 +174,7 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
                         check+=1
                     }
                     else if categories[i].tracker[z].schedule[0] == 0 {
-                        let tracker = Tracker(id: categories[i].tracker[z].id, color: categories[i].tracker[z].color, name: categories[i].tracker[z].name, emoji: categories[i].tracker[z].emoji, schedule: [selectedDayInt])
+                        let tracker = Tracker(id: categories[i].tracker[z].id, color: categories[i].tracker[z].color, name: categories[i].tracker[z].name, emoji: categories[i].tracker[z].emoji, schedule: [selectedDayInt], dateOfAddition: Date())
                         trackerList.append(tracker)
                         let newCategory = TrackerCategory(categoryName:categories[i].categoryName , tracker: trackerList)
                         if check == 0 {
@@ -291,30 +297,8 @@ extension TrackersViewController: TrackersViewControllerDelegate {
     }
     
     func didAppendTracker(tracker: Tracker,category: String) {
-        self.tracker = tracker
-        if categories.count != 0{
-            var check = 0
-            for i in 0..<categories.count{
-                if category == categories[i].categoryName{
-                    check+=1
-                    trackers[i].append(tracker)
-                    let newTrackerCategories = TrackerCategory(categoryName: category, tracker: trackers[i])
-                    categories[i] = newTrackerCategories
-                    break
-                }
-            }
-            if check == 0{
-                trackers.append([tracker])
-                let newTrackerCategories = TrackerCategory(categoryName: category, tracker: [tracker])
-                categories.append(newTrackerCategories)
-            }
-        }
-        else{
-            trackers.append([tracker])
-            let newTrackerCategories = TrackerCategory(categoryName: category, tracker: trackers[0])
-            categories.append(newTrackerCategories)
-        }
-        setCurrentDayCollections()
+        trackerCategoryStore.addNewCategory(name: category)
+        trackerStore.addNewTracker(tracker: tracker, category: category)
     }
     
 }
@@ -322,20 +306,9 @@ extension TrackersViewController: TrackersViewControllerDelegate {
 extension TrackersViewController: CollectionViewCellForTrackersDelegate {
     func didTapButton(id: UUID) {
         if idSameDate(date: todayDate) || todayDate>currentDate{
-            if !isComplete(id: id){
-                let recordTracker = TrackerRecord(id: id, date: currentDate)
-                completedTrackers.append(recordTracker)
-            }
-            else{
-                for i in 0..<completedTrackers.count{
-                    if completedTrackers[i].id == id && idSameDate(date: completedTrackers[i].date){
-                        completedTrackers.remove(at: i)
-                        break
-                    }
-                }
-            }
-            collectionView.reloadData()
+            trackerStore.addOrDeleteTrackerRecord(id: id,date: currentDate,isComplete:isComplete(id: id))
         }
+        
     }
 }
 
@@ -351,6 +324,19 @@ extension TrackersViewController: UISearchBarDelegate {
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBarText = ""
         setCurrentDayCollections()
+    }
+    
+}
+extension TrackersViewController: TrackerCategoryStoreDelegate{
+    func getCategories() {
+        categories = trackerCategoryStore.getTracker()
+        setCurrentDayCollections()
+    }
+}
+extension TrackersViewController:TrackerStoreDelegate{
+    func changeRecordValue(completedTrackers: [TrackerRecord]) {
+        self.completedTrackers = completedTrackers
+        collectionView.reloadData()
     }
     
 }
