@@ -78,15 +78,14 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
     
     private lazy var trackerCategoryStore = TrackerCategoryStore()
     
-    private lazy var trackerRecordStore = TrackerRecordStore()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
         categories = trackerCategoryStore.getTracker()
+        trackerStore.delegate = self
         setCurrentDayCollections()
-        trackerRecordStore.delegate = self
-        completedTrackers = trackerRecordStore.getAllTrackerRecords()
+        completedTrackers = trackerStore.getComletedTrackers()
         trackerCategoryStore.delegate = self
     }
     
@@ -175,7 +174,7 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
                         check+=1
                     }
                     else if categories[i].tracker[z].schedule[0] == 0 {
-                        let tracker = Tracker(id: categories[i].tracker[z].id, color: categories[i].tracker[z].color, name: categories[i].tracker[z].name, emoji: categories[i].tracker[z].emoji, schedule: [selectedDayInt])
+                        let tracker = Tracker(id: categories[i].tracker[z].id, color: categories[i].tracker[z].color, name: categories[i].tracker[z].name, emoji: categories[i].tracker[z].emoji, schedule: [selectedDayInt], dateOfAddition: Date())
                         trackerList.append(tracker)
                         let newCategory = TrackerCategory(categoryName:categories[i].categoryName , tracker: trackerList)
                         if check == 0 {
@@ -307,15 +306,9 @@ extension TrackersViewController: TrackersViewControllerDelegate {
 extension TrackersViewController: CollectionViewCellForTrackersDelegate {
     func didTapButton(id: UUID) {
         if idSameDate(date: todayDate) || todayDate>currentDate{
-            if !isComplete(id: id){
-                trackerRecordStore.newTrackerRecord(trackerId: id, date: currentDate)
-                //print(completedTrackers)
-            }
-            else{
-                trackerRecordStore.deleteTrackerRecord(id: id,date:currentDate)
-            }
-            //collectionView.reloadData()
+            trackerStore.addOrDeleteTrackerRecord(id: id,date: currentDate,isComplete:isComplete(id: id))
         }
+        
     }
 }
 
@@ -334,22 +327,16 @@ extension TrackersViewController: UISearchBarDelegate {
     }
     
 }
-
-extension TrackersViewController: TrackerRecordStoreDelegate{
-    
-    func changeRecordValue() {
-        print(1223)
-        completedTrackers = trackerRecordStore.getAllTrackerRecords()
-        print(completedTrackers)
-        collectionView.reloadData()
-    }
-    
-}
 extension TrackersViewController: TrackerCategoryStoreDelegate{
     func getCategories() {
         categories = trackerCategoryStore.getTracker()
         setCurrentDayCollections()
     }
 }
-
-
+extension TrackersViewController:TrackerStoreDelegate{
+    func changeRecordValue(completedTrackers: [TrackerRecord]) {
+        self.completedTrackers = completedTrackers
+        collectionView.reloadData()
+    }
+    
+}

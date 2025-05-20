@@ -67,7 +67,7 @@ class CreateNewTrackerViewController: UIViewController {
         guard let dataInt = delegate?.currentDateInt() else { return }
         guard let color = colorTracker else { return }
         let schedule = shared.numberOfDaysForDateInt.count > 0 ? shared.numberOfDaysForDateInt : [dataInt]
-        let newTracker = Tracker(id: UUID(),color: color, name: nameTracker, emoji: emojiTracker, schedule: schedule)
+        let newTracker = Tracker(id: UUID(),color: color, name: nameTracker, emoji: emojiTracker, schedule: schedule, dateOfAddition: Date())
         self.delegate?.dismissAndCreateCategory(tracker: newTracker, category: nameCategory)
         dismiss(animated: true)
     }

@@ -39,7 +39,6 @@ final class ChoosingCategoryOrHabit: UIViewController, UINavigationControllerDel
     
     @objc func action(){
         showNextController(name: "Нерегулярное событие")
-        
     }
     private func showNextController(name: String){
         shared.habitOrEventName(name)

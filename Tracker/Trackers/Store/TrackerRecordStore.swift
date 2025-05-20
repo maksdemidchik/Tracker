@@ -8,17 +8,8 @@
 import CoreData
 import UIKit
 
-protocol TrackerRecordStoreDelegate: AnyObject {
-    func changeRecordValue()
-}
-protocol testDelegate: AnyObject {
-    func test()
-}
-
-final class TrackerRecordStore: NSObject {
-    private lazy var trackerStore = TrackerStore()
-    weak var testDelegate: testDelegate?
-    weak var delegate: TrackerRecordStoreDelegate?
+final class TrackerRecordStore: NSObject,NSFetchedResultsControllerDelegate {
+    
     private lazy var fetchResultsController: NSFetchedResultsController<TrackerRecordCoreData> = {
         let fetchRequest = TrackerRecordCoreData.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "id", ascending: true)]
@@ -27,6 +18,7 @@ final class TrackerRecordStore: NSObject {
         try? fetchedController.performFetch()
         return fetchedController
     }()
+    
     private lazy var context: NSManagedObjectContext = {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate  else {
             fatalError("Error getting AppDelegate")
@@ -38,13 +30,9 @@ final class TrackerRecordStore: NSObject {
         let newTrackerRecord = TrackerRecordCoreData(context: context)
         newTrackerRecord.id = trackerId
         newTrackerRecord.date = date
-        if let tracker = trackerStore.getTrackerById(id: trackerId){
-            newTrackerRecord.tracker = tracker
-        }
         if context.hasChanges {
             try? context.save()
         }
-        trackerStore.set(id: trackerId)
     }
     
     func deleteTrackerRecord(id: UUID,date:Date){
@@ -55,7 +43,6 @@ final class TrackerRecordStore: NSObject {
                 }
             }
         }
-        delegate?.changeRecordValue()
         if context.hasChanges {
             try? context.save()
         }
@@ -73,26 +60,16 @@ final class TrackerRecordStore: NSObject {
         return trackersRecord
     }
     
-    func v(id:UUID) -> [TrackerRecordCoreData]{
-        var x : [TrackerRecordCoreData] = []
+    func getTrackersRecordCoreData(id:UUID) -> [TrackerRecordCoreData]{
+        var trackersRecordCoreData : [TrackerRecordCoreData] = []
         if let obj = fetchResultsController.fetchedObjects{
-            for i in obj{
-                if i.id == id{
-                    x.append(i)
+            for trackerRecordCoreData in obj{
+                if trackerRecordCoreData.id == id{
+                    trackersRecordCoreData.append(trackerRecordCoreData)
                 }
             }
         }
-        return x
-    }
-}
-extension TrackerRecordStore: NSFetchedResultsControllerDelegate{
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
-        if let delegate = delegate{
-            delegate.changeRecordValue()
-        }
-        else{
-            print("error")
-        }
+        return trackersRecordCoreData
     }
 }
 

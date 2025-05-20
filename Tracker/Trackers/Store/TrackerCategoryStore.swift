@@ -14,9 +14,6 @@ protocol TrackerCategoryStoreDelegate: AnyObject {
 
 final class TrackerCategoryStore: NSObject {
     private let colorMarshalling = UIColorMarshalling.shared
-    
-    private lazy var trackerStore = TrackerStore()
-    weak var delegate: TrackerCategoryStoreDelegate?
     private lazy var fetchResultsController: NSFetchedResultsController<TrackerCategoryCoreData> = {
         let fetchRequest = TrackerCategoryCoreData.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "categoryName", ascending: true)]
@@ -40,6 +37,8 @@ final class TrackerCategoryStore: NSObject {
         return []
     }()
     
+    weak var delegate: TrackerCategoryStoreDelegate?
+    
     func addNewCategory(name: String) {
         if nameCategories.contains(name) == false {
             let category = TrackerCategoryCoreData(context: context)
@@ -59,8 +58,8 @@ final class TrackerCategoryStore: NSObject {
                 if let tracker = categories[z].trackers as? Set<TrackerCoreData>, tracker.count > 0,let categoryName = categories[z].categoryName {
                     var trackers: [Tracker] = []
                     for i in tracker {
-                        if let id = i.id,let color = i.color, let name = i.name, let emoji = i.emoji, let schedule = i.schedule as? Array<Int>{
-                            trackers.append(Tracker(id: id, color: colorMarshalling.color(from: color), name: name, emoji: emoji, schedule: schedule))
+                        if let id = i.id,let color = i.color, let name = i.name, let emoji = i.emoji, let schedule = i.schedule as? Array<Int>,let date = i.dateOfAddition{
+                            trackers.append(Tracker(id: id, color: colorMarshalling.color(from: color), name: name, emoji: emoji, schedule: schedule, dateOfAddition: date))
                         }
                     }
                     let newCategoryTracker = TrackerCategory(categoryName: categoryName, tracker: trackers)
