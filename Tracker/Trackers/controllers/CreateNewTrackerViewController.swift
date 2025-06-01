@@ -23,7 +23,7 @@ class CreateNewTrackerViewController: UIViewController {
         return button
     }()
     
-    private let creatButton : UIButton = {
+    private let createButton : UIButton = {
         let button = UIButton()
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 16
@@ -41,8 +41,6 @@ class CreateNewTrackerViewController: UIViewController {
     }()
     
     private var nameTracker = ""
-    
-    private var nameCategory = "Важное"
     
     private var textBeforeWarning = ""
     
@@ -68,20 +66,20 @@ class CreateNewTrackerViewController: UIViewController {
         guard let color = colorTracker else { return }
         let schedule = shared.numberOfDaysForDateInt.count > 0 ? shared.numberOfDaysForDateInt : [dataInt]
         let newTracker = Tracker(id: UUID(),color: color, name: nameTracker, emoji: emojiTracker, schedule: schedule, dateOfAddition: Date())
-        self.delegate?.dismissAndCreateCategory(tracker: newTracker, category: nameCategory)
+        self.delegate?.dismissAndCreateCategory(tracker: newTracker, category: shared.curruntCategory)
         dismiss(animated: true)
     }
     
-    private func setCreatButton(){
-        creatButton.translatesAutoresizingMaskIntoConstraints = false
-        creatButton.isEnabled = false
-        creatButton.addTarget(self, action: #selector(creatButtonAction), for: .touchDown)
-        view.addSubview(creatButton)
-        creatButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
-        creatButton.leadingAnchor.constraint(equalTo: cancelButton.trailingAnchor, constant: 8).isActive = true
-        creatButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
-        creatButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16).isActive = true
-        creatButton.widthAnchor.constraint(equalTo: cancelButton.widthAnchor).isActive = true
+    private func setCreateButton(){
+        createButton.translatesAutoresizingMaskIntoConstraints = false
+        createButton.isEnabled = false
+        createButton.addTarget(self, action: #selector(creatButtonAction), for: .touchDown)
+        view.addSubview(createButton)
+        createButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        createButton.leadingAnchor.constraint(equalTo: cancelButton.trailingAnchor, constant: 8).isActive = true
+        createButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
+        createButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16).isActive = true
+        createButton.widthAnchor.constraint(equalTo: cancelButton.widthAnchor).isActive = true
     }
     
     private func setCancelButton(){
@@ -105,7 +103,7 @@ class CreateNewTrackerViewController: UIViewController {
     
     private func setUI(){
         setCancelButton()
-        setCreatButton()
+        setCreateButton()
         setCollectionView()
         view.backgroundColor = .white
         if shared.habitOrEvent == "Нерегулярное событие"{
@@ -118,10 +116,10 @@ class CreateNewTrackerViewController: UIViewController {
     }
     
     private func createButtonIsActiveCheck(){
-        let checkingIfThereIsASchedule = (shared.habitOrEvent == "Привычка" && shared.setSchudule().count > 0) || shared.habitOrEvent == "Нерегулярное событие"   ? true : false
-        if nameTracker.count > 0 && emojiTracker.count > 0 && checkingIfThereIsASchedule && colorTracker != nil{
-            creatButton.isEnabled = true
-            creatButton.backgroundColor = .blackYP
+        let checkingIfThereIsASchedule = (shared.habitOrEvent == "Привычка" && shared.setSchedule().count > 0) || shared.habitOrEvent == "Нерегулярное событие"   ? true : false
+        if nameTracker.count > 0 && emojiTracker.count > 0 && checkingIfThereIsASchedule && colorTracker != nil && shared.curruntCategory != ""{
+            createButton.isEnabled = true
+            createButton.backgroundColor = .blackYP
         }
         else{
             createButtonIsNotActive()
@@ -129,20 +127,25 @@ class CreateNewTrackerViewController: UIViewController {
     }
     
     private func createButtonIsNotActive(){
-        creatButton.isEnabled = false
-        creatButton.backgroundColor = .grayYP
+        createButton.isEnabled = false
+        createButton.backgroundColor = .grayYP
     }
     
     private func showScheduleController() {
         let vc = ScheduleViewController()
         vc.delegate = self
         let creatScheduleViewController = UINavigationController(rootViewController: vc)
-
+        
         present(creatScheduleViewController,animated: true)
     }
     
     func showCategoryController() {
-        
+        let vc = CategoryViewController()
+        let viewModel = CategoryViewModel()
+        viewModel.delegate = self
+        vc.viewModel = viewModel
+        let creatCategoryViewController = UINavigationController(rootViewController: vc)
+        present(creatCategoryViewController,animated: true)
     }
 }
 
@@ -209,7 +212,7 @@ extension CreateNewTrackerViewController: UITableViewDelegate {
             showScheduleController()
         }
         else{
-            
+            showCategoryController()
         }
     }
 }
@@ -256,4 +259,12 @@ extension CreateNewTrackerViewController: CollectionViewForCreateTrackerCellDele
     func changeSizeCollectionView(){
         collectionView.reloadData()
     }
+}
+
+extension CreateNewTrackerViewController: CategoryViewModelDelegate{
+    func didNameCategory() {
+        collectionView.reloadData()
+        createButtonIsActiveCheck()
+    }
+    
 }

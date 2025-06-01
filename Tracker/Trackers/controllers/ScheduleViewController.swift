@@ -6,6 +6,7 @@
 //
 
 import UIKit
+
 protocol AddHabitDelegate: AnyObject {
     func setScheduleText()
 }
@@ -52,7 +53,7 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate  {
         setUI()
     }
     
-    @objc func readyAction(){
+    @objc private func readyAction(){
         dismiss(animated: true)
         delegate?.setScheduleText()
     }
@@ -97,7 +98,7 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate  {
         if indexPath.row == 6{
             cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: tableView.bounds.width)
         }
-       
+        
     }
     
 }
@@ -112,7 +113,7 @@ extension ScheduleViewController: ScheduleCelldDelegate {
             service.removeFromSchdule(numberDays: indexPath.row)
         }
     }
-       
+    
 }
 
 extension ScheduleViewController: UITableViewDataSource {

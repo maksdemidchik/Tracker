@@ -27,8 +27,8 @@ final class TrackerStore: NSObject{
     private lazy var fetchResultsController: NSFetchedResultsController<TrackerCoreData> = {
         let fetchRequest = TrackerCoreData.fetchRequest()
         fetchRequest.sortDescriptors = [
-                    NSSortDescriptor(key: "dateOfAddition", ascending: true)
-                ]
+            NSSortDescriptor(key: "dateOfAddition", ascending: true)
+        ]
         let fetchedController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
         fetchedController.delegate = self
         try? fetchedController.performFetch()
@@ -74,7 +74,7 @@ final class TrackerStore: NSObject{
         }
     }
     
-    func getComletedTrackers() -> [TrackerRecord]{
+    func getCompletedTrackers() -> [TrackerRecord]{
         return trackerRecordStore.getAllTrackerRecords()
     }
     
@@ -87,11 +87,12 @@ extension TrackerStore: NSFetchedResultsControllerDelegate{
     func numberOfRowsInSection(_ section: Int) -> Int {
         fetchResultsController.sections?[section].numberOfObjects ?? 0
     }
-
+    
     func object(at indexPath: IndexPath) -> TrackerCoreData? {
         fetchResultsController.object(at: indexPath)
     }
+    
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
-        delegate?.changeRecordValue(completedTrackers: getComletedTrackers())
+        delegate?.changeRecordValue(completedTrackers: getCompletedTrackers())
     }
 }

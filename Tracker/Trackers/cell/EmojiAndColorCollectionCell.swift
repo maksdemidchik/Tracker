@@ -20,16 +20,9 @@ final class EmojiAndColorCollectionCell: UICollectionViewCell {
         colorView.layer.cornerRadius = 12
         return colorView
     }()
-    /*
-    override var isSelected: Bool{
-        didSet {
-            contentView.backgroundColor = isSelected ?  .textField : .clear
-        }
-    }
-    */
     override init(frame: CGRect) {
         super.init(frame: frame)
-        SetUI()
+        setUI()
     }
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -51,7 +44,7 @@ final class EmojiAndColorCollectionCell: UICollectionViewCell {
         color.widthAnchor.constraint(equalToConstant: 40).isActive = true
     }
     
-    private func SetUI(){
+    private func setUI(){
         setEmojiLabel()
         setColor()
     }

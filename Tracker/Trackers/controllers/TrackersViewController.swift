@@ -85,18 +85,18 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         categories = trackerCategoryStore.getTracker()
         trackerStore.delegate = self
         setCurrentDayCollections()
-        completedTrackers = trackerStore.getComletedTrackers()
+        completedTrackers = trackerStore.getCompletedTrackers()
         trackerCategoryStore.delegate = self
     }
     
-    @objc func plusButtonAction(){
+    @objc private func plusButtonAction(){
         let vc = ChoosingCategoryOrHabit()
         vc.delegate = self
         let vc1 = UINavigationController(rootViewController: vc)
         present(vc1,animated: true)
     }
     
-    @objc func changeDate(_ sender: UIDatePicker){
+    @objc private func changeDate(_ sender: UIDatePicker){
         let date = sender.date
         let weekdayInt = Calendar.current.component(.weekday, from: date)
         selectedDayInt = weekdayInt
@@ -108,14 +108,14 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
     private func setUpSearchAndPlusButtonAndDataPickerUI(){
         let plusButton1 = UIBarButtonItem(image:UIImage(named: "plus"),style: .plain, target: self, action: #selector(self.plusButtonAction))
         plusButton1.tintColor = .blackYP
-       
+        
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationBar.topItem?.title = "Трекеры"
         navigationController?.navigationBar.topItem?.leftBarButtonItem = plusButton1
         navigationController?.navigationBar.topItem?.rightBarButtonItem = UIBarButtonItem(customView: dataPicker)
         dataPicker.addTarget(self, action: #selector(changeDate), for: .valueChanged)
         navigationController?.navigationBar.backgroundColor = .whiteYP
-       
+        
         navigationController?.navigationBar.topItem?.searchController = searchBar
         searchBar.searchBar.placeholder = "Поиск"
         searchBar.searchBar.delegate = self
@@ -297,7 +297,6 @@ extension TrackersViewController: TrackersViewControllerDelegate {
     }
     
     func didAppendTracker(tracker: Tracker,category: String) {
-        trackerCategoryStore.addNewCategory(name: category)
         trackerStore.addNewTracker(tracker: tracker, category: category)
     }
     

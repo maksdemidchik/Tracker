@@ -39,12 +39,14 @@ final class TrackerCategoryStore: NSObject {
     
     weak var delegate: TrackerCategoryStoreDelegate?
     
+    
     func addNewCategory(name: String) {
-        if nameCategories.contains(name) == false {
+        if !nameCategories.contains(name) {
             let category = TrackerCategoryCoreData(context: context)
             category.categoryName = name
             category.trackers = NSSet(array: [])
             nameCategories.append(name)
+            print(3)
             if context.hasChanges{
                 try? context.save()
             }
@@ -52,22 +54,22 @@ final class TrackerCategoryStore: NSObject {
     }
     
     func getTracker()->[TrackerCategory]{
-        var categoryTrackers1: [TrackerCategory] = []
+        var newCategoryTrackers: [TrackerCategory] = []
         if  let categories = fetchResultsController.fetchedObjects{
-            for z in 0..<categories.count{
-                if let tracker = categories[z].trackers as? Set<TrackerCoreData>, tracker.count > 0,let categoryName = categories[z].categoryName {
+            for currentCategories in 0..<categories.count{
+                if let tracker = categories[currentCategories].trackers as? Set<TrackerCoreData>, tracker.count > 0,let categoryName = categories[currentCategories].categoryName {
                     var trackers: [Tracker] = []
-                    for i in tracker {
-                        if let id = i.id,let color = i.color, let name = i.name, let emoji = i.emoji, let schedule = i.schedule as? Array<Int>,let date = i.dateOfAddition{
+                    for category in tracker {
+                        if let id = category.id,let color = category.color, let name = category.name, let emoji = category.emoji, let schedule = category.schedule as? Array<Int>,let date = category.dateOfAddition{
                             trackers.append(Tracker(id: id, color: colorMarshalling.color(from: color), name: name, emoji: emoji, schedule: schedule, dateOfAddition: date))
                         }
                     }
                     let newCategoryTracker = TrackerCategory(categoryName: categoryName, tracker: trackers)
-                    categoryTrackers1.append(newCategoryTracker)
+                    newCategoryTrackers.append(newCategoryTracker)
                 }
             }
         }
-        return categoryTrackers1
+        return newCategoryTrackers
     }
     
     func fetchCategory(string: String) -> TrackerCategoryCoreData?{
@@ -80,6 +82,18 @@ final class TrackerCategoryStore: NSObject {
         }
         return nil
     }
+    func getGategories() -> [String]{
+        var categoriesTracker: [String] = []
+        if let categories = fetchResultsController.fetchedObjects{
+            for category in categories {
+                if let categoryName = category.categoryName{
+                    categoriesTracker.append(categoryName)
+                }
+            }
+            
+        }
+        return categoriesTracker
+    }
     
 }
 extension TrackerCategoryStore: NSFetchedResultsControllerDelegate{
@@ -89,7 +103,7 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate{
     func numberOfRowsInSection(_ section: Int) -> Int {
         fetchResultsController.sections?[section].numberOfObjects ?? 0
     }
-
+    
     func object(at indexPath: IndexPath) -> TrackerCategoryCoreData? {
         fetchResultsController.object(at: indexPath)
     }
