@@ -160,8 +160,12 @@ final class CollectionViewForCreateTrackerCell:UICollectionViewCell {
             cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: tableView.bounds.width)
         }
         if shared.numberOfDays.count > 0 && indexPath.row == 1 {
-            cell.daysLabel.isHidden = false
-            cell.daysLabel.text = shared.setSchudule()
+            cell.daysOrCategoryNameLabel.isHidden = false
+            cell.daysOrCategoryNameLabel.text = shared.setSchedule()
+        }
+        else if shared.curruntCategory != "" && indexPath.row == 0 {
+            cell.daysOrCategoryNameLabel.isHidden = false
+            cell.daysOrCategoryNameLabel.text = shared.curruntCategory
         }
     }
     private func configCellCollection(cell:EmojiAndColorCollectionCell, indexPath: IndexPath){
@@ -180,10 +184,7 @@ final class CollectionViewForCreateTrackerCell:UICollectionViewCell {
 
 extension CollectionViewForCreateTrackerCell:  UITableViewDataSource{
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if shared.habitOrEvent == "Привычка"{
-            return 2
-        }
-        return 1
+        shared.habitOrEvent == "Привычка" ? 2 : 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

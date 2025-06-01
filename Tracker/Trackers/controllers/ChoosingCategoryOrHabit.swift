@@ -16,7 +16,7 @@ final class ChoosingCategoryOrHabit: UIViewController, UINavigationControllerDel
     
     weak var delegate: TrackersViewControllerDelegate?
     
-    private let habbitButton: UIButton = {
+    private let habitButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Привычка", for: .normal)
         return button
@@ -33,11 +33,11 @@ final class ChoosingCategoryOrHabit: UIViewController, UINavigationControllerDel
         setUI()
     }
     
-    @objc func habitAction(){
+    @objc private func habitAction(){
         showNextController(name: "Привычка")
     }
     
-    @objc func action(){
+    @objc private func action(){
         showNextController(name: "Нерегулярное событие")
     }
     private func showNextController(name: String){
@@ -46,9 +46,9 @@ final class ChoosingCategoryOrHabit: UIViewController, UINavigationControllerDel
         vc.delegate = self
         self.navigationController?.pushViewController(vc, animated: true)
     }
-    private func setHabbitButton(){
-        habbitButton.addTarget(self, action: #selector(habitAction), for: .touchDown)
-        generalAtThePositionOfTheButtons(button: habbitButton, float: 281)
+    private func setHabitButton(){
+        habitButton.addTarget(self, action: #selector(habitAction), for: .touchDown)
+        generalAtThePositionOfTheButtons(button: habitButton, float: 281)
     }
     
     private func setIrregularEvents(){
@@ -73,7 +73,7 @@ final class ChoosingCategoryOrHabit: UIViewController, UINavigationControllerDel
     private func setUI(){
         navigationItem.title = "Создание трекера"
         view.backgroundColor = .whiteYP
-        setHabbitButton()
+        setHabitButton()
         setIrregularEvents()
     }
 }

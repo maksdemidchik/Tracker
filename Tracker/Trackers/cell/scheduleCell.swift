@@ -22,8 +22,6 @@ final class ScheduleCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setUI()
         contentView.backgroundColor = .textField
-        accessoryType = .none
-        selectionStyle = .none
     }
     
     required init?(coder: NSCoder) {
@@ -49,7 +47,6 @@ final class ScheduleCell: UITableViewCell {
         onOffSwitch.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16).isActive = true
         onOffSwitch.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
     }
-    
     private func setUI(){
         setDayTitleUI()
         setOnOffSwitchUI()

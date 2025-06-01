@@ -14,6 +14,9 @@ final class CreateNewTrackerAndScheduleServices {
     var isWarning : Bool = false
     var habitOrEvent : String = ""
     let abbreviationOfNamesDays = ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"]
+    var previousIndexPath : IndexPath?
+    var currentIndexPath : IndexPath?
+    var curruntCategory : String = ""
     
     let numberOfDaysInt = [2,3,4,5,6,7,1]
     
@@ -38,15 +41,19 @@ final class CreateNewTrackerAndScheduleServices {
         numberOfDaysForDateInt = sortNumberOfDays
         schdule = sortArray
     }
+    
     func habitOrEventName(_ name: String) {
         habitOrEvent = name
     }
+    
     func setWarning(){
         isWarning = true
     }
+    
     func deletedWarning(){
         isWarning = false
     }
+    
     func addToSchdule(numberDays: Int) {
         schdule.append(abbreviationOfNamesDays[numberDays])
         numberOfDaysForDateInt.append(numberOfDaysInt[numberDays])
@@ -64,7 +71,7 @@ final class CreateNewTrackerAndScheduleServices {
         }
     }
     
-    func setSchudule() -> String{
+    func setSchedule() -> String{
         var string = ""
         sort()
         if schdule.count != 7{
@@ -83,7 +90,16 @@ final class CreateNewTrackerAndScheduleServices {
         return string
     }
     
+    func setIndexPathAndNameCategory(indexPath: IndexPath,nameCategory: String){
+        previousIndexPath = currentIndexPath
+        curruntCategory = nameCategory
+        currentIndexPath = indexPath
+    }
+    
     func remove(){
+        curruntCategory = ""
+        currentIndexPath = nil
+        previousIndexPath = nil
         schdule.removeAll()
         numberOfDays.removeAll()
         numberOfDaysForDateInt.removeAll()

@@ -8,11 +8,11 @@
 import UIKit
 
 final class StatistikViewController: UIViewController {
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .whiteYP
     }
     
-
+    
 }

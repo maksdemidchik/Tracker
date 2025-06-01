@@ -13,7 +13,7 @@ final class CellCategoriesAndSchedule: UITableViewCell {
     
     let label = UILabel()
     
-    let daysLabel = UILabel()
+    let daysOrCategoryNameLabel = UILabel()
     
     var stackView = UIStackView()
     
@@ -40,8 +40,8 @@ final class CellCategoriesAndSchedule: UITableViewCell {
     }
     
     private func setStackViewUI(){
-        daysLabel.isHidden = true
-        stackView = UIStackView(arrangedSubviews: [label,daysLabel])
+        daysOrCategoryNameLabel.isHidden = true
+        stackView = UIStackView(arrangedSubviews: [label,daysOrCategoryNameLabel])
         stackView.axis = .vertical
         stackView.spacing = 2
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -49,7 +49,7 @@ final class CellCategoriesAndSchedule: UITableViewCell {
         stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16).isActive = true
         stackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
         label.textColor = .blackYP
-        daysLabel.textColor = .grayYP
+        daysOrCategoryNameLabel.textColor = .grayYP
     }
     
     private func setUI(){

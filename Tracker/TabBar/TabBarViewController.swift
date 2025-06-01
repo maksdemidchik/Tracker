@@ -8,7 +8,7 @@
 import UIKit
 
 final class TabBarViewController: UITabBarController {
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setTabBarViewControllerSettings()
@@ -25,7 +25,7 @@ final class TabBarViewController: UITabBarController {
         line.trailingAnchor.constraint(equalTo: tabBar.safeAreaLayoutGuide.trailingAnchor).isActive = true
         line.heightAnchor.constraint(equalToConstant: 0.2).isActive = true
     }
-
+    
     private func setTabBarViewControllerSettings(){
         let vc = TrackersViewController()
         let rootVc = UINavigationController(rootViewController: vc)
@@ -35,5 +35,5 @@ final class TabBarViewController: UITabBarController {
         viewControllers = [rootVc, statistikViewController]
         setLine()
     }   
-
+    
 }
