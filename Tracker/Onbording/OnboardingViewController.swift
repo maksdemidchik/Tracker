@@ -12,7 +12,8 @@ final class OnboardingViewController: UIViewController {
     
     private var button : UIButton = {
         let button = UIButton()
-        button.setTitle("Вот это технологии!", for: .normal)
+        let text = NSLocalizedString("ButtonOnboarding", comment: "ButtonOnboarding")
+        button.setTitle(text, for: .normal)
         button.tintColor = .colorSelection10
         button.backgroundColor = .blackYP
         button.layer.masksToBounds = true

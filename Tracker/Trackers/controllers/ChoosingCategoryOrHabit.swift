@@ -18,13 +18,15 @@ final class ChoosingCategoryOrHabit: UIViewController, UINavigationControllerDel
     
     private let habitButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Привычка", for: .normal)
+        let text = NSLocalizedString("buttomHabbitText", comment: "buttomHabbitText")
+        button.setTitle(text, for: .normal)
         return button
     }()
     
     private let irrgularButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Нерегулярное событие", for: .normal)
+        let text = NSLocalizedString("buttomNewIrregularEventText", comment: "buttonIrregularEvent")
+        button.setTitle(text, for: .normal)
         return button
     }()
     private let shared = CreateNewTrackerAndScheduleServices.shared
@@ -71,7 +73,8 @@ final class ChoosingCategoryOrHabit: UIViewController, UINavigationControllerDel
     }
     
     private func setUI(){
-        navigationItem.title = "Создание трекера"
+        let text = NSLocalizedString("CreateTrackerText", comment: "CreateTrackerText")
+        navigationItem.title = text
         view.backgroundColor = .whiteYP
         setHabitButton()
         setIrregularEvents()

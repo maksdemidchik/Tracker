@@ -43,6 +43,7 @@ final class ScheduleCell: UITableViewCell {
         onOffSwitch.translatesAutoresizingMaskIntoConstraints = false
         onOffSwitch.addTarget(self, action: #selector(switchValueDidChange), for: .valueChanged)
         contentView.addSubview(onOffSwitch)
+        onOffSwitch.tintColor = .red
         onOffSwitch.onTintColor = .blue
         onOffSwitch.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16).isActive = true
         onOffSwitch.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true

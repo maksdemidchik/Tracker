@@ -7,7 +7,7 @@
 
 import UIKit
 
-class CategoryViewController: UIViewController {
+final class CategoryViewController: UIViewController {
     var viewModel : CategoryViewModel?
     
     private let tableView : UITableView = {
@@ -17,12 +17,16 @@ class CategoryViewController: UIViewController {
         tableView.layer.cornerRadius = 16
         tableView.tableHeaderView = UIView()
         tableView.rowHeight = 75
+        tableView.backgroundColor = .clear
+        tableView.separatorStyle = .singleLine
+        tableView.separatorColor = .lightGray
         return tableView
     }()
     
     private let plugText : UILabel = {
         let label = UILabel()
-        label.text = "Привычки события можно\n объединить по смыслу"
+        let text = NSLocalizedString("placeholderCategoryText", comment: "placeholderCategoryText")
+        label.text = text
         label.numberOfLines = 2
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.textColor = .blackYP
@@ -39,11 +43,12 @@ class CategoryViewController: UIViewController {
     
     private let addCategoryButton : UIButton = {
         let button = UIButton()
-        button.setTitle("Добавить категорию", for: .normal)
+        let text = NSLocalizedString("addCategory", comment: "addCategory")
+        button.setTitle(text, for: .normal)
         button.backgroundColor = .blackYP
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 16
-        button.tintColor = .whiteYP
+        button.setTitleColor(.whiteYP, for: .normal)
         return button
     }()
     
@@ -133,7 +138,8 @@ class CategoryViewController: UIViewController {
     
     private func setUI(){
         view.backgroundColor = .whiteYP
-        navigationItem.title = "Категория"
+        let text = NSLocalizedString("CategoryText", comment: "CategoryText")
+        navigationItem.title = text
         navigationItem.hidesBackButton = true
         setButton()
         setTableView()

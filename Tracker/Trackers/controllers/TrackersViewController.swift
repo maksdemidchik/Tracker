@@ -48,7 +48,8 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
     
     private let plugText : UILabel = {
         let label = UILabel()
-        label.text = "Что будем отслеживать?"
+        let text = NSLocalizedString("textPlaceholder", comment: "Placeholder text")
+        label.text = text
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.textColor = .blackYP
         label.textAlignment = .center
@@ -110,14 +111,16 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         plusButton1.tintColor = .blackYP
         
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.navigationBar.topItem?.title = "Трекеры"
+        let textTracker = NSLocalizedString("trackerText", comment: "tracker")
+        navigationController?.navigationBar.topItem?.title = textTracker
         navigationController?.navigationBar.topItem?.leftBarButtonItem = plusButton1
         navigationController?.navigationBar.topItem?.rightBarButtonItem = UIBarButtonItem(customView: dataPicker)
         dataPicker.addTarget(self, action: #selector(changeDate), for: .valueChanged)
         navigationController?.navigationBar.backgroundColor = .whiteYP
         
+        let searchText = NSLocalizedString("searchText", comment: "search")
         navigationController?.navigationBar.topItem?.searchController = searchBar
-        searchBar.searchBar.placeholder = "Поиск"
+        searchBar.searchBar.placeholder = searchText
         searchBar.searchBar.delegate = self
     }
     
@@ -130,6 +133,7 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
         collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        collectionView.backgroundColor = .whiteYP
     }
     
     private func setUpPlaceholder(){
@@ -205,7 +209,8 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         cell.setImageButton(isCompleted: isComplete(id: id))
         cell.trackerID = id
         let number = countIfCompleted(id: id)
-        cell.setDays(number: number)
+        let dayText = String.localizedStringWithFormat(NSLocalizedString("numberOfdays", comment: "dayCountCompleted"), number)
+        cell.daylabel.text = dayText
         cell.delegate = self
     }
     

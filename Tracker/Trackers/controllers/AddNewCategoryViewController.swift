@@ -15,7 +15,8 @@ class AddNewCategoryViewController: UIViewController {
     
     private var textField : UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Введите название категории"
+        let text = NSLocalizedString("categoryTextFieldPlaceholder", comment: "categoryTextFieldPlaceholder")
+        textField.placeholder = text
         textField.backgroundColor = .textField
         textField.layer.masksToBounds = true
         textField.layer.cornerRadius = 16
@@ -28,7 +29,8 @@ class AddNewCategoryViewController: UIViewController {
         let button = UIButton()
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 16
-        button.setTitle( "Готово", for: .normal)
+        let text = NSLocalizedString("readyText", comment: "readyText")
+        button.setTitle(text, for: .normal)
         button.tintColor = .whiteYP
         button.backgroundColor = .grayYP
         button.isEnabled = false
@@ -65,7 +67,8 @@ class AddNewCategoryViewController: UIViewController {
     private func setUI(){
         navigationItem.hidesBackButton = true
         view.backgroundColor = .whiteYP
-        navigationItem.title = "Новая категория"
+        let text = NSLocalizedString("newCategory", comment: "newCategory")
+        navigationItem.title = text
         setTextField()
         setCreateButton()
     }
@@ -73,6 +76,7 @@ class AddNewCategoryViewController: UIViewController {
         if nameCategory.count > 0{
             createButton.isEnabled = true
             createButton.backgroundColor = .blackYP
+            createButton.setTitleColor(.whiteYP, for: .normal)
         }
         else{
             createButton.isEnabled = false

@@ -7,7 +7,7 @@
 
 import UIKit
 
-class CreateNewTrackerViewController: UIViewController {
+final class CreateNewTrackerViewController: UIViewController {
     
     private let shared = CreateNewTrackerAndScheduleServices.shared
     
@@ -16,7 +16,8 @@ class CreateNewTrackerViewController: UIViewController {
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 16
         button.layer.borderColor = UIColor.systemRed.cgColor
-        button.setTitle("Отменить", for: .normal)
+        let text = NSLocalizedString("cancelText", comment: "cancelText")
+        button.setTitle(text, for: .normal)
         button.layer.borderWidth = 1
         button.backgroundColor = .whiteYP
         button.setTitleColor(.red, for: .normal)
@@ -27,8 +28,9 @@ class CreateNewTrackerViewController: UIViewController {
         let button = UIButton()
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 16
-        button.setTitle( "Создать", for: .normal)
-        button.tintColor = .whiteYP
+        let text = NSLocalizedString("createText", comment: "createText")
+        button.setTitle(text , for: .normal)
+        button.setTitleColor(.white, for: .normal)
         button.backgroundColor = .grayYP
         return button
     }()
@@ -99,18 +101,21 @@ class CreateNewTrackerViewController: UIViewController {
         collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: cancelButton.topAnchor,constant: -16).isActive = true
+        collectionView.backgroundColor = .whiteYP
     }
     
     private func setUI(){
         setCancelButton()
         setCreateButton()
         setCollectionView()
-        view.backgroundColor = .white
+        view.backgroundColor = .whiteYP
         if shared.habitOrEvent == "Нерегулярное событие"{
-            navigationItem.title = "Новое нерегулярное событие"
+            let text = NSLocalizedString("NewHabitText", comment: "NewHabitText")
+            navigationItem.title = text
         }
         else{
-            navigationItem.title = "Новая привычка"
+            let text = NSLocalizedString("NewIrregularEvent", comment: "NewIrregularEvent")
+            navigationItem.title = text
         }
         navigationItem.hidesBackButton = true
     }
@@ -120,6 +125,7 @@ class CreateNewTrackerViewController: UIViewController {
         if nameTracker.count > 0 && emojiTracker.count > 0 && checkingIfThereIsASchedule && colorTracker != nil && shared.curruntCategory != ""{
             createButton.isEnabled = true
             createButton.backgroundColor = .blackYP
+            createButton.setTitleColor(.whiteYP, for: .normal)
         }
         else{
             createButtonIsNotActive()

@@ -9,11 +9,27 @@ import Foundation
 
 final class CreateNewTrackerAndScheduleServices {
     static let shared = CreateNewTrackerAndScheduleServices()
-    
+    let scheduleDay = [
+        NSLocalizedString("monday", comment: "monday"),
+        NSLocalizedString("tuesday", comment: "tuesday"),
+        NSLocalizedString("wednesday", comment: "wednesday"),
+        NSLocalizedString("thursday", comment: "thursday"),
+        NSLocalizedString("friday", comment: "friday"),
+        NSLocalizedString("saturday", comment: "saturday"),
+        NSLocalizedString("sunday", comment: "sunday")
+    ]
     private init() {}
     var isWarning : Bool = false
     var habitOrEvent : String = ""
-    let abbreviationOfNamesDays = ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"]
+    let abbreviationOfNamesDays = [
+        NSLocalizedString("mon", comment: "monday"),
+        NSLocalizedString("tue", comment: "tue"),
+        NSLocalizedString("wed", comment: "wed"),
+        NSLocalizedString("thu", comment: "thu"),
+        NSLocalizedString("fri", comment: "fri"),
+        NSLocalizedString("sat", comment: "sat"),
+        NSLocalizedString("sun", comment: "sun")
+    ]
     var previousIndexPath : IndexPath?
     var currentIndexPath : IndexPath?
     var curruntCategory : String = ""
@@ -85,7 +101,8 @@ final class CreateNewTrackerAndScheduleServices {
             }
         }
         else{
-            string = "Каждый день"
+            let text = NSLocalizedString("everyDay", comment: "everyDay")
+            string = text
         }
         return string
     }

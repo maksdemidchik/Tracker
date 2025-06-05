@@ -23,6 +23,8 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate  {
         tableView.isScrollEnabled = false
         tableView.tableHeaderView = UIView()
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        tableView.separatorStyle = .singleLine
+        tableView.separatorColor = .lightGray
         tableView.rowHeight = 75
         return tableView
     }()
@@ -36,17 +38,18 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate  {
     
     private let readyButton : UIButton = {
         let button = UIButton()
-        button.setTitle("Готово", for: .normal)
+        let text = NSLocalizedString("readyText", comment: "readyText")
+        button.setTitle(text, for: .normal)
         button.backgroundColor = .blackYP
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 16
-        button.tintColor = .whiteYP
+        button.setTitleColor(.whiteYP, for: .normal)
         return button
     }()
     
-    private let weekDays = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
-    
     private let service = CreateNewTrackerAndScheduleServices.shared
+    
+    private lazy var weekDays = service.scheduleDay
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -82,7 +85,8 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate  {
     private func setUI(){
         navigationItem.hidesBackButton = true
         view.backgroundColor = .whiteYP
-        navigationItem.title = "Расписание"
+        let text = NSLocalizedString("ScheduleText", comment: "ScheduleText")
+        navigationItem.title = text
         setTableView()
         setReadyButton()
     }

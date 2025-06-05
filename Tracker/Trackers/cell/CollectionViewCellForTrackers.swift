@@ -50,7 +50,7 @@ final class CollectionViewCellForTrackers: UICollectionViewCell {
     
     var daylabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
+        label.textColor = .blackYP
         label.font = .systemFont(ofSize: 12, weight: .medium)
         return label
     }()
@@ -132,19 +132,6 @@ final class CollectionViewCellForTrackers: UICollectionViewCell {
         setViewsUI()
         setLabelUI()
         setButtonUI()
-    }
-    
-    func setDays(number: Int) {
-        if number == 1
-        {
-            daylabel.text = "\(number) день"
-        }
-        else if number == 2 || number == 3 || number == 4 {
-            daylabel.text =  "\(number) дня"
-        }
-        else{
-            daylabel.text =  "\(number) дней"
-        }
     }
     
     func setImageButton(isCompleted: Bool){

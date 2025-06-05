@@ -46,7 +46,8 @@ final class CollectionViewForCreateTrackerCell:UICollectionViewCell {
     
     private let warningLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ограничение 38 символов"
+        let text = NSLocalizedString("warningLabelText", comment: "warningLabelText")
+        label.text = text
         label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         label.textColor = .ypRed
@@ -55,7 +56,8 @@ final class CollectionViewForCreateTrackerCell:UICollectionViewCell {
     
     let textField : UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Введите название трекера"
+        let text = NSLocalizedString("trackerTextFieldPlaceholder", comment: "trackerTextFieldPlaceholder")
+        textField.placeholder = text
         textField.backgroundColor = .textField
         textField.layer.masksToBounds = true
         textField.layer.cornerRadius = 16
@@ -127,10 +129,15 @@ final class CollectionViewForCreateTrackerCell:UICollectionViewCell {
         tableView.trailingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.trailingAnchor,constant: -16).isActive = true
         if shared.habitOrEvent == "Привычка"{
             tableView.heightAnchor.constraint(equalToConstant: 150).isActive = true
+            tableView.separatorStyle = .none
         }
         else{
             tableView.heightAnchor.constraint(equalToConstant: 75).isActive = true
+            tableView.separatorStyle = .singleLine
+            tableView.separatorColor = .lightGray
         }
+        tableView.separatorStyle = .singleLine
+        tableView.separatorColor = .lightGray
     }
     
     private func setCollectionView(){
@@ -142,6 +149,7 @@ final class CollectionViewForCreateTrackerCell:UICollectionViewCell {
         collectionView.trailingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.trailingAnchor).isActive = true
         collectionView.leadingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.leadingAnchor).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        collectionView.backgroundColor = .whiteYP
         
     }
     
@@ -153,10 +161,15 @@ final class CollectionViewForCreateTrackerCell:UICollectionViewCell {
     
     private func configCell(cell: CellCategoriesAndSchedule,indexPath:IndexPath) {
         if indexPath.row == 0{
-            cell.label.text = "Категория"
+            let text = NSLocalizedString("CategoryText", comment: "CategoryText")
+            cell.label.text = text
+            if shared.habitOrEvent == "Нерегулярное событие"{
+                cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: tableView.bounds.width)
+            }
         }
         else{
-            cell.label.text = "Расписание"
+            let text = NSLocalizedString("ScheduleText", comment: "ScheduleText")
+            cell.label.text = text
             cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: tableView.bounds.width)
         }
         if shared.numberOfDays.count > 0 && indexPath.row == 1 {
@@ -200,7 +213,8 @@ extension CollectionViewForCreateTrackerCell:  UITableViewDataSource{
                 header.titleLabel.text = "Emoji"
             }
             else{
-                header.titleLabel.text = "Цвет"
+                let text = NSLocalizedString("colorText", comment: "colorText")
+                header.titleLabel.text = text
             }
             return header
         }
