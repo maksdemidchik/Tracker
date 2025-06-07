@@ -11,8 +11,6 @@ final class StatistikViewController: UIViewController {
     
     private let storageRecord = TrackerRecordStore()
     
-    private let storage = TrackerStore()
-    
     private var stackView = UIStackView()
     
     private let plugText : UILabel = {
@@ -62,7 +60,7 @@ final class StatistikViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         completedTrackersCountLabel.text = String(storageRecord.getAllTrackerRecords().count)
-        if storage.numberOfRowsInSection(0) > 0{
+        if storageRecord.getAllTrackerRecords().count > 0{
             stackView.isHidden = true
             card.isHidden = false
         }

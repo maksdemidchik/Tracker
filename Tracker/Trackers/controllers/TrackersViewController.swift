@@ -405,9 +405,15 @@ extension TrackersViewController: TrackerCategoryStoreDelegate{
     }
 }
 extension TrackersViewController:TrackerStoreDelegate{
-    func changeRecordValue(completedTrackers: [TrackerRecord]) {
+    func changeRecordValue(completedTrackers: [TrackerRecord],changeSchedule:Bool) {
         self.completedTrackers = completedTrackers
-        collectionView.reloadData()
+        categories = trackerCategoryStore.getTracker()
+        if changeSchedule{
+            setCurrentDayCollections()
+        }
+        else{
+            collectionView.reloadData()
+        }
     }
     
 }

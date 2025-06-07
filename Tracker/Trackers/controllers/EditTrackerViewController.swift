@@ -108,9 +108,9 @@ final class EditTrackerViewController: UIViewController {
     }
     
     @objc private func saveButtonAction(){
-        let schedule = shared.numberOfDaysForDateInt
+        let newSchedule = shared.numberOfDaysForDateInt
         guard let color = colorTracker else { return }
-        let newTracker = Tracker(id: trackerId,color: color, name: nameTracker, emoji: emojiTracker, schedule: schedule, dateOfAddition: dateOfAddition, isItPinned: isFixed)
+        let newTracker = Tracker(id: trackerId,color: color, name: nameTracker, emoji: emojiTracker, schedule: newSchedule, dateOfAddition: dateOfAddition, isItPinned: isFixed)
         delegate?.editNewTracker(id: trackerId, oldCategory: category, TrackerCategory: TrackerCategory(categoryName: shared.curruntCategory, tracker: [newTracker]))
         dismiss(animated: true)
     }

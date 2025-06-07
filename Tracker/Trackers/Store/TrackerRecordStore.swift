@@ -48,6 +48,19 @@ final class TrackerRecordStore: NSObject,NSFetchedResultsControllerDelegate {
         }
     }
     
+    func deleteTracker(id:UUID){
+        if let objects = try? context.fetch(NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")) {
+            for trackerRecord in objects {
+                if id == trackerRecord.id{
+                    context.delete(trackerRecord)
+                }
+            }
+        }
+        if context.hasChanges {
+            try? context.save()
+        }
+    }
+    
     func getAllTrackerRecords() -> [TrackerRecord] {
         var trackersRecord: [TrackerRecord] = []
         if let objects = try? context.fetch(NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")) {
