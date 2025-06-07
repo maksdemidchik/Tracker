@@ -31,6 +31,7 @@ final class OnboardingPageViewController: UIPageViewController  {
         pageControl.currentPage = 0
         
         pageControl.currentPageIndicatorTintColor = .blackYP
+        pageControl.overrideUserInterfaceStyle = .light
         pageControl.pageIndicatorTintColor = .placeholderText
         
         pageControl.translatesAutoresizingMaskIntoConstraints = false

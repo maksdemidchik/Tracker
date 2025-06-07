@@ -16,6 +16,7 @@ final class OnboardingViewController: UIViewController {
         button.setTitle(text, for: .normal)
         button.tintColor = .colorSelection10
         button.backgroundColor = .blackYP
+        button.overrideUserInterfaceStyle = .light
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 16
         button.isHidden = false
@@ -30,6 +31,7 @@ final class OnboardingViewController: UIViewController {
         let label = UILabel()
         label.font = .systemFont(ofSize: 32, weight: .bold)
         label.textColor = .blackYP
+        label.overrideUserInterfaceStyle = .light
         label.textAlignment = .center
         label.numberOfLines = 2
         label.translatesAutoresizingMaskIntoConstraints = false

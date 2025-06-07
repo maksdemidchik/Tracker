@@ -17,7 +17,7 @@ final class TabBarViewController: UITabBarController {
     private func setLine(){
         let line = UIView()
         line.translatesAutoresizingMaskIntoConstraints = false
-        line.backgroundColor = .gray
+        line.backgroundColor = .line
         tabBar.addSubview(line)
         
         line.topAnchor.constraint(equalTo: tabBar.safeAreaLayoutGuide.topAnchor).isActive = true

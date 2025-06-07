@@ -54,8 +54,11 @@ final class CollectionViewForCreateTrackerCell:UICollectionViewCell {
         return label
     }()
     
-    let textField : UITextField = {
+    lazy var textField : UITextField = {
         let textField = UITextField()
+        if shared.nameOfTracker != "" {
+            textField.text = shared.nameOfTracker
+        }
         let text = NSLocalizedString("trackerTextFieldPlaceholder", comment: "trackerTextFieldPlaceholder")
         textField.placeholder = text
         textField.backgroundColor = .textField
@@ -119,7 +122,7 @@ final class CollectionViewForCreateTrackerCell:UICollectionViewCell {
     
     private func setTableView(){
         tableView.dataSource = self
-        if shared.habitOrEvent == "Нерегулярное событие" {
+        if shared.habitOrEvent != "Привычка" {
             tableView.separatorStyle = .none
         }
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -127,14 +130,14 @@ final class CollectionViewForCreateTrackerCell:UICollectionViewCell {
         tableView.topAnchor.constraint(equalTo: stackView.bottomAnchor, constant: 24).isActive = true
         tableView.leadingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.leadingAnchor,constant: 16).isActive = true
         tableView.trailingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.trailingAnchor,constant: -16).isActive = true
-        if shared.habitOrEvent == "Привычка"{
-            tableView.heightAnchor.constraint(equalToConstant: 150).isActive = true
-            tableView.separatorStyle = .none
-        }
-        else{
+        if shared.habitOrEvent == "Нерегулярное событие" {
             tableView.heightAnchor.constraint(equalToConstant: 75).isActive = true
             tableView.separatorStyle = .singleLine
             tableView.separatorColor = .lightGray
+        }
+        else{
+            tableView.heightAnchor.constraint(equalToConstant: 150).isActive = true
+            tableView.separatorStyle = .none
         }
         tableView.separatorStyle = .singleLine
         tableView.separatorColor = .lightGray
@@ -163,7 +166,7 @@ final class CollectionViewForCreateTrackerCell:UICollectionViewCell {
         if indexPath.row == 0{
             let text = NSLocalizedString("CategoryText", comment: "CategoryText")
             cell.label.text = text
-            if shared.habitOrEvent == "Нерегулярное событие"{
+            if shared.habitOrEvent == "Нерегулярное событие" {
                 cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: tableView.bounds.width)
             }
         }
@@ -186,18 +189,28 @@ final class CollectionViewForCreateTrackerCell:UICollectionViewCell {
             cell.color.isHidden = true
             cell.emojiLabel.isHidden = false
             cell.emojiLabel.text = emoji[indexPath.row]
+            if shared.emojiComparison(emoji: emoji[indexPath.row]){
+                cell.emojiSelected()
+                pastSelectedEmojiIndexPath = indexPath
+                delegate?.setEmoji(emoji: emoji[indexPath.row])
+            }
         }
         else{
             cell.emojiLabel.isHidden = true
             cell.color.isHidden = false
             cell.color.backgroundColor = color[indexPath.row]
+            if shared.colorComparison(color: color[indexPath.row]){
+                cell.colorSelected(color: color[indexPath.row])
+                pastSelectedColorIndexPath = indexPath
+                delegate?.setColor(color: color[indexPath.row])
+            }
         }
     }
 }
 
 extension CollectionViewForCreateTrackerCell:  UITableViewDataSource{
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        shared.habitOrEvent == "Привычка" ? 2 : 1
+        return shared.habitOrEvent == "Нерегулярное событие" ? 1 : 2
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

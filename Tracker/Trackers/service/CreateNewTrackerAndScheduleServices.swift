@@ -5,10 +5,11 @@
 //  Created by Maxim on 25.04.2025.
 //
 
-import Foundation
+import UIKit
 
 final class CreateNewTrackerAndScheduleServices {
     static let shared = CreateNewTrackerAndScheduleServices()
+    private let colorMarshalling = UIColorMarshalling.shared
     let scheduleDay = [
         NSLocalizedString("monday", comment: "monday"),
         NSLocalizedString("tuesday", comment: "tuesday"),
@@ -33,11 +34,12 @@ final class CreateNewTrackerAndScheduleServices {
     var previousIndexPath : IndexPath?
     var currentIndexPath : IndexPath?
     var curruntCategory : String = ""
-    
+    var nameOfTracker : String = ""
+    var tracker : Tracker?
     let numberOfDaysInt = [2,3,4,5,6,7,1]
-    
+    var emoji : String = ""
     var schdule : [String] = []
-    
+    var color : UIColor?
     var numberOfDays : Set<Int> = []
     
     var numberOfDaysForDateInt : [Int] = []
@@ -101,18 +103,44 @@ final class CreateNewTrackerAndScheduleServices {
             }
         }
         else{
-            let text = NSLocalizedString("everyDay", comment: "everyDay")
-            string = text
+            string = "Каждый день"
         }
         return string
     }
     
     func setIndexPathAndNameCategory(indexPath: IndexPath,nameCategory: String){
-        previousIndexPath = currentIndexPath
+        if currentIndexPath != nil {
+            previousIndexPath = currentIndexPath
+        }
         curruntCategory = nameCategory
         currentIndexPath = indexPath
     }
+    func setIndexPathPreviousIndexPathIfNeed(IndexPath:IndexPath){
+        if previousIndexPath == nil {
+            previousIndexPath = IndexPath
+        }
+    }
     
+    func setNilIndexPath(){
+        previousIndexPath = nil
+        currentIndexPath = nil
+    }
+    func convertScheduleToString(schdule: [Int]) -> [String]{
+        var number: [Int] = []
+        var answer: [String] = []
+        for day in schdule {
+            for i in 0..<numberOfDaysInt.count{
+                if day == numberOfDaysInt[i] {
+                    number.append(i)
+                }
+            }
+        }
+        for i in number {
+            answer.append(abbreviationOfNamesDays[i])
+        }
+        numberOfDays = Set(number)
+        return answer
+    }
     func remove(){
         curruntCategory = ""
         currentIndexPath = nil
@@ -120,6 +148,28 @@ final class CreateNewTrackerAndScheduleServices {
         schdule.removeAll()
         numberOfDays.removeAll()
         numberOfDaysForDateInt.removeAll()
+        emoji = ""
+        color = nil
+        nameOfTracker = ""
     }
     
+    func setTrackerAndCategoryName(tracker: Tracker,name: String){
+        self.schdule = convertScheduleToString(schdule: tracker.schedule)
+        self.numberOfDaysForDateInt = tracker.schedule
+        self.curruntCategory = name
+        self.nameOfTracker = tracker.name
+        self.emoji = tracker.emoji
+        self.color = tracker.color
+    }
+    
+    func emojiComparison(emoji: String) -> Bool {
+        return self.emoji == emoji
+    }
+    
+    func colorComparison(color: UIColor) -> Bool{
+        if let colorTracker = self.color{
+            return colorMarshalling.hexString(from: colorTracker) == colorMarshalling.hexString(from: color)
+        }
+        return false
+    }
 }

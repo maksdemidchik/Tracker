@@ -80,17 +80,13 @@ final class CategoryViewController: UIViewController {
             guard let self = self else { return }
             if viewModel.getPreviousIndexPath() != nil,let indexPath = viewModel.getPreviousIndexPath() {
                 self.tableView.deselectRow(at: indexPath, animated: true)
-                guard let cell = self.tableView.cellForRow(at: indexPath) as? CategoryCell else {
-                    return
-                }
+                guard let cell = self.tableView.cellForRow(at: indexPath) as? CategoryCell else { return }
                 cell.checkMarkImageView.isHidden = true
             }
             
             if let indexPath = viewModel.getCurrentIndexPath(){
                 self.tableView.deselectRow(at: indexPath, animated: true)
-                guard let cell = self.tableView.cellForRow(at: indexPath) as? CategoryCell else {
-                    return
-                }
+                guard let cell = self.tableView.cellForRow(at: indexPath) as? CategoryCell else { return }
                 cell.checkMarkImageView.isHidden = false
             }
             
@@ -150,7 +146,11 @@ final class CategoryViewController: UIViewController {
     private func configCell(cell: CategoryCell,indexPath: IndexPath){
         guard let categories = viewModel?.getCategories() else { return }
         cell.categoryName.text = categories[indexPath.row]
-        cell.checkMarkImageView.isHidden = !(viewModel?.checkNeedACheckmark(currentIndexPath: indexPath) ?? false)
+        let shouldUseCheckmark: Bool = viewModel?.checkNeedACheckmark(nameCategory: categories[indexPath.row]) ?? false
+        cell.checkMarkImageView.isHidden = !shouldUseCheckmark
+        if viewModel?.getPreviousIndexPath() == nil && shouldUseCheckmark{
+            viewModel?.updatePreviousIndexPath(indexPath: indexPath)
+        }
         if indexPath.row == categories.count - 1 {
             cell.layer.masksToBounds = true
             cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: tableView.bounds.width)

@@ -44,3 +44,15 @@
 "newCategory"  = "New category";
 "placeholderCategoryText" = "Event habits can be\n united by meaning";
 "addCategory" = "Add category";
+"pinned" = "Pinned";
+"pin" = "Pin";
+"unpin" = "Unpin";
+"delete" = "Delete";
+"cancel" = "Cancel";
+"textDeleteAlert" = "Are you sure you want to delete the tracker?";
+"edit" = "Edit";
+"save" = "Save";
+"EditingHabit" = "Editing a Habit";
+"trackersCompleted" = "Trackers completed";
+"textPlaceholderStatistik" = "There is nothing to analyze yet";
+"placeholderSearchBar" = "Nothing found";

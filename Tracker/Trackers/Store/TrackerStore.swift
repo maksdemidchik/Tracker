@@ -45,15 +45,59 @@ final class TrackerStore: NSObject{
         newTracker.color = colorMarshalling.hexString(from: tracker.color)
         newTracker.schedule = tracker.schedule as NSArray?
         newTracker.dateOfAddition = tracker.dateOfAddition
+        newTracker.isItPinned = tracker.isItPinned
         newTracker.category = trackerCategoryStore.fetchCategory(string: category)
         if context.hasChanges{
             try? context.save()
         }
     }
     
+    func editTracker(id:UUID,oldCategory:String,newCategory:String,trackerEdit:Tracker){
+        if let objects = fetchResultsController.fetchedObjects{
+            for tracker in objects{
+                if tracker.id == id{
+                    tracker.name = trackerEdit.name
+                    tracker.emoji = trackerEdit.emoji
+                    tracker.color = colorMarshalling.hexString(from: trackerEdit.color)
+                    tracker.schedule = trackerEdit.schedule as NSArray
+                    tracker.category = trackerCategoryStore.fetchCategory(string: newCategory)
+                    if context.hasChanges{
+                        try? context.save()
+                    }
+                }
+            }
+        }
+    }
+    
+    func deleteTracker(id:UUID){
+        if let objects = fetchResultsController.fetchedObjects{
+            for tracker in objects{
+                if tracker.id == id{
+                    context.delete(tracker)
+                    if context.hasChanges{
+                        try? context.save()
+                    }
+                }
+            }
+        }
+    }
+    
+    func trackerPinnedOrUnpinned(id:UUID){
+        if let objects = fetchResultsController.fetchedObjects{
+            for tracker in objects{
+                if tracker.id == id{
+                    tracker.isItPinned = !tracker.isItPinned
+                    if context.hasChanges{
+                        try? context.save()
+                    }
+                }
+            }
+        }
+    }
+    
     func decodingTracker(indexPath:IndexPath) -> Tracker?{
         if let tracker = object(at: indexPath), let id = tracker.id, let colorString = tracker.color,let name = tracker.name ,let emoji = tracker.emoji,let schdule = tracker.schedule as? [Int],let date = tracker.dateOfAddition{
-            return Tracker(id: id, color: colorMarshalling.color(from: colorString), name: name, emoji: emoji, schedule: schdule, dateOfAddition: date)
+            return Tracker(id: id, color: colorMarshalling.color(from: colorString), name: name, emoji: emoji, schedule: schdule, dateOfAddition: date, isItPinned: tracker.isItPinned)
         }
         return nil
     }

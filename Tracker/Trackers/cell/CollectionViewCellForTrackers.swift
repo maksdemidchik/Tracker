@@ -9,6 +9,9 @@ import UIKit
 
 protocol CollectionViewCellForTrackersDelegate: AnyObject {
     func didTapButton(id: UUID)
+    func deleteTrecker(id:UUID)
+    func pinnedOrUnpinned(id:UUID)
+    func editTracker(id:UUID)
 }
 
 final class CollectionViewCellForTrackers: UICollectionViewCell {
@@ -24,6 +27,8 @@ final class CollectionViewCellForTrackers: UICollectionViewCell {
     var trackerID : UUID?
     
     var indexPath: IndexPath?
+    
+    var isItPin: Bool = false
     
     var emojiLabel: UILabel = {
         let label = UILabel()
@@ -62,9 +67,16 @@ final class CollectionViewCellForTrackers: UICollectionViewCell {
     
     var color: UIColor?
     
+    var pinEmojiView : UIImageView = {
+        let image = UIImageView()
+        image.image = UIImage(named: "pin")
+        return image
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setUI()
+        setContext()
     }
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -113,8 +125,10 @@ final class CollectionViewCellForTrackers: UICollectionViewCell {
     private func setViewsUI() {
         nameAndEmojiView.translatesAutoresizingMaskIntoConstraints = false
         emojiView.translatesAutoresizingMaskIntoConstraints = false
+        pinEmojiView.translatesAutoresizingMaskIntoConstraints = false
         
         contentView.addSubview(nameAndEmojiView)
+        nameAndEmojiView.addSubview(pinEmojiView)
         nameAndEmojiView.addSubview(emojiView)
         
         nameAndEmojiView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
@@ -126,12 +140,22 @@ final class CollectionViewCellForTrackers: UICollectionViewCell {
         emojiView.topAnchor.constraint(equalTo: topAnchor, constant: 12).isActive = true
         emojiView.heightAnchor.constraint(equalToConstant: 24).isActive = true
         emojiView.widthAnchor.constraint(equalToConstant: 24).isActive = true
+        
+        pinEmojiView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -4).isActive = true
+        pinEmojiView.topAnchor.constraint(equalTo: topAnchor, constant: 12).isActive = true
+        pinEmojiView.heightAnchor.constraint(equalToConstant: 24).isActive = true
+        pinEmojiView.widthAnchor.constraint(equalToConstant: 24).isActive = true
     }
     
     private func setUI() {
         setViewsUI()
         setLabelUI()
         setButtonUI()
+    }
+    func setContext(){
+        let interaction = UIContextMenuInteraction(delegate: self)
+        nameAndEmojiView.isUserInteractionEnabled = true
+        nameAndEmojiView.addInteraction(interaction)
     }
     
     func setImageButton(isCompleted: Bool){
@@ -146,4 +170,37 @@ final class CollectionViewCellForTrackers: UICollectionViewCell {
             button.tintColor = color
         }
     }
+}
+
+extension CollectionViewCellForTrackers:UIContextMenuInteractionDelegate{
+    func contextMenuInteraction(
+            _ interaction: UIContextMenuInteraction,
+            configurationForMenuAtLocation location: CGPoint
+        ) -> UIContextMenuConfiguration? {
+            return UIContextMenuConfiguration(
+                identifier: nil,
+                previewProvider: nil,
+                actionProvider: { [weak self] _ in
+                    guard let self = self else { return nil }
+                    let textPin = NSLocalizedString("pin", comment: "pinned")
+                    let textUnpin = NSLocalizedString("unpin", comment: "pinned")
+                    let pinnedText = self.isItPin ? textUnpin : textPin
+                    let pinnedOrUnpinned = UIAction(title: pinnedText) { [weak self] _ in
+                        guard let self = self,let trackerID = self.trackerID  else { return }
+                        self.delegate?.pinnedOrUnpinned(id: trackerID)
+                    }
+                    let deleteText = NSLocalizedString("delete", comment: "delete")
+                    let deleteAction = UIAction(title: deleteText, attributes: .destructive) {[weak self] _ in
+                        guard let self = self,let trackerID = self.trackerID  else { return }
+                        self.delegate?.deleteTrecker(id: trackerID)
+                    }
+                    let editText = NSLocalizedString("edit", comment: "edit")
+                    let editAction = UIAction(title: editText) { [weak self] _ in
+                        guard let self = self,let trackerID = self.trackerID  else { return }
+                        self.delegate?.editTracker(id: trackerID)
+                    }
+                    return UIMenu(title: "", children: [pinnedOrUnpinned, editAction, deleteAction])
+                }
+            )
+        }
 }

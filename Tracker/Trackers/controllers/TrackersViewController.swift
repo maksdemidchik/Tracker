@@ -21,7 +21,7 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
     
     private var categories: [TrackerCategory] = []
     
-    private var currentcCategories: [TrackerCategory] = []
+    private var currentCategories: [TrackerCategory] = []
     
     private var completedTrackers: [TrackerRecord] = []
     
@@ -43,6 +43,10 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         let dataPicker = UIDatePicker()
         dataPicker.datePickerMode = .date
         dataPicker.preferredDatePickerStyle = .compact
+        dataPicker.backgroundColor = .white
+        dataPicker.layer.cornerRadius = 8
+        dataPicker.layer.masksToBounds = true
+        dataPicker.overrideUserInterfaceStyle = .light
         return dataPicker
     }()
     
@@ -155,11 +159,11 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         setUpPlaceholder()
         setUpSearchAndPlusButtonAndDataPickerUI()
         setCollectionView()
-        collectionView.isHidden = currentcCategories.count == 0
+        collectionView.isHidden = currentCategories.count == 0
     }
     
     private func setCurrentDayCollections(){
-        currentcCategories = []
+        currentCategories = []
         var x1=0
         for i in 0..<categories.count {
             var trackerList : [Tracker] = []
@@ -170,22 +174,22 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
                         trackerList.append(categories[i].tracker[z])
                         let newCategory = TrackerCategory(categoryName:categories[i].categoryName , tracker: trackerList)
                         if check == 0 {
-                            currentcCategories.append(newCategory)
+                            currentCategories.append(newCategory)
                         }
                         else{
-                            currentcCategories[x1] = newCategory
+                            currentCategories[x1] = newCategory
                         }
                         check+=1
                     }
                     else if categories[i].tracker[z].schedule[0] == 0 {
-                        let tracker = Tracker(id: categories[i].tracker[z].id, color: categories[i].tracker[z].color, name: categories[i].tracker[z].name, emoji: categories[i].tracker[z].emoji, schedule: [selectedDayInt], dateOfAddition: Date())
+                        let tracker = Tracker(id: categories[i].tracker[z].id, color: categories[i].tracker[z].color, name: categories[i].tracker[z].name, emoji: categories[i].tracker[z].emoji, schedule: [selectedDayInt], dateOfAddition: Date(), isItPinned: false)
                         trackerList.append(tracker)
                         let newCategory = TrackerCategory(categoryName:categories[i].categoryName , tracker: trackerList)
                         if check == 0 {
-                            currentcCategories.append(newCategory)
+                            currentCategories.append(newCategory)
                         }
                         else{
-                            currentcCategories[x1] = newCategory
+                            currentCategories[x1] = newCategory
                         }
                         check+=1
                     }
@@ -197,21 +201,27 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         }
         collectionView.reloadData()
         collectionView.isHidden = x1 == 0
+        let nameImage = searchBarText.count == 0 ? "placeholder" : "placeholder SearchBar"
+        let textPlaceholder = searchBarText.count == 0 ? NSLocalizedString("textPlaceholder", comment: "Placeholder text") : NSLocalizedString("placeholderSearchBar", comment: "Placeholder text")
+        imagePlaceholder.image = UIImage(named: nameImage)
+        plugText.text = textPlaceholder
     }
     
     private func configCell(cell: CollectionViewCellForTrackers,indexPath: IndexPath){
-        let id = currentcCategories[indexPath.section].tracker[indexPath.row].id
-        cell.emojiLabel.text = currentcCategories[indexPath.section].tracker[indexPath.row].emoji
-        cell.namesTrackers.text = currentcCategories[indexPath.section].tracker[indexPath.row].name
-        cell.nameAndEmojiView.backgroundColor = currentcCategories[indexPath.section].tracker[indexPath.row].color
-        cell.button.backgroundColor = currentcCategories[indexPath.section].tracker[indexPath.row].color
-        cell.color = currentcCategories[indexPath.section].tracker[indexPath.row].color
+        let id = currentCategories[indexPath.section].tracker[indexPath.row].id
+        cell.emojiLabel.text = currentCategories[indexPath.section].tracker[indexPath.row].emoji
+        cell.namesTrackers.text = currentCategories[indexPath.section].tracker[indexPath.row].name
+        cell.nameAndEmojiView.backgroundColor = currentCategories[indexPath.section].tracker[indexPath.row].color
+        cell.button.backgroundColor = currentCategories[indexPath.section].tracker[indexPath.row].color
+        cell.color = currentCategories[indexPath.section].tracker[indexPath.row].color
         cell.setImageButton(isCompleted: isComplete(id: id))
         cell.trackerID = id
         let number = countIfCompleted(id: id)
         let dayText = String.localizedStringWithFormat(NSLocalizedString("numberOfdays", comment: "dayCountCompleted"), number)
         cell.daylabel.text = dayText
         cell.delegate = self
+        cell.isItPin = currentCategories[indexPath.section].tracker[indexPath.row].isItPinned
+        cell.pinEmojiView.isHidden = !currentCategories[indexPath.section].tracker[indexPath.row].isItPinned
     }
     
     private func isComplete(id:UUID) -> Bool {
@@ -236,14 +246,43 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         }
         return count
     }
+    private func editingTheTracker(id:UUID,category:String,trackerCategory:TrackerCategory){
+        var indexCategory = -1
+        var indexTracker = -1
+        let categoryIsSame = category == trackerCategory.categoryName
+        for i in 0..<currentCategories.count {
+            var trackers = currentCategories[i].tracker
+            for j in 0..<currentCategories[i].tracker.count {
+                if currentCategories[i].tracker[j].id == id && trackerCategory.categoryName == category {
+                    trackers.remove(at: j)
+                    trackers.insert(trackerCategory.tracker[0], at: j)
+                    currentCategories[i] = TrackerCategory(categoryName: category, tracker: trackers)
+                    return
+                }
+                else if currentCategories[i].tracker[j].id == id && trackerCategory.categoryName != category {
+                    indexCategory = i
+                    indexTracker = j
+                }
+                else if currentCategories[i].categoryName == trackerCategory.categoryName{
+                    let newTrackers = currentCategories[i].tracker
+                    currentCategories[i] = TrackerCategory(categoryName: trackerCategory.categoryName, tracker: newTrackers+trackerCategory.tracker)
+                }
+            }
+        }
+        if categoryIsSame == false{
+            var trackers = currentCategories[indexCategory].tracker
+            trackers.remove(at: indexTracker)
+            currentCategories[indexCategory] = TrackerCategory(categoryName: category, tracker: trackers)
+        }
+    }
 }
 
 extension TrackersViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if section == 0 && currentcCategories.count == 0 {
+        if section == 0 && currentCategories.count == 0 {
             return 0
         }
-        return currentcCategories[section].tracker.count
+        return currentCategories[section].tracker.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -256,14 +295,14 @@ extension TrackersViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath) as? HeadersCollectionViewCellForTrackers {
-            header.titleLabel.text = currentcCategories[indexPath.section].categoryName
+            header.titleLabel.text = currentCategories[indexPath.section].categoryName
             return header
         }
         return UICollectionReusableView()
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return currentcCategories.count
+        return currentCategories.count
     }
 }
 
@@ -308,6 +347,34 @@ extension TrackersViewController: TrackersViewControllerDelegate {
 }
 
 extension TrackersViewController: CollectionViewCellForTrackersDelegate {
+    func editTracker(id: UUID) {
+        let tracker = trackerCategoryStore.getTrackerAndCategoryName(id: id)
+        let vc = EditTrackerViewController(tracker: tracker,delegate: self,count:countIfCompleted(id: id))
+        let vc1 = UINavigationController(rootViewController: vc)
+        present(vc1,animated: true)
+    }
+    
+    func pinnedOrUnpinned(id: UUID) {
+        trackerStore.trackerPinnedOrUnpinned(id: id)
+        categories = trackerCategoryStore.getTracker()
+        setCurrentDayCollections()
+    }
+    
+    func deleteTrecker(id: UUID) {
+        let alertText = NSLocalizedString("textDeleteAlert", comment: "textDeleteAlert")
+        let alert = UIAlertController(title: alertText, message: nil, preferredStyle: .actionSheet)
+        let deleteText = NSLocalizedString("delete", comment: "delete")
+        let delete = UIAlertAction(title: deleteText, style: .destructive){[weak self] _ in
+            guard let self = self else { return }
+            self.trackerStore.deleteTracker(id: id)
+        }
+        let cancelText = NSLocalizedString("cancel", comment: "cancel")
+        let cancel = UIAlertAction(title: cancelText, style: .cancel){ _ in }
+        alert.addAction(delete)
+        alert.addAction(cancel)
+        present(alert, animated: true)
+    }
+    
     func didTapButton(id: UUID) {
         if idSameDate(date: todayDate) || todayDate>currentDate{
             trackerStore.addOrDeleteTrackerRecord(id: id,date: currentDate,isComplete:isComplete(id: id))
@@ -343,4 +410,11 @@ extension TrackersViewController:TrackerStoreDelegate{
         collectionView.reloadData()
     }
     
+}
+
+extension TrackersViewController: EditTrackerViewControllerDelegate{
+    func editNewTracker(id: UUID,oldCategory:String,TrackerCategory:TrackerCategory) {
+        editingTheTracker(id: id, category: oldCategory, trackerCategory: TrackerCategory)
+        trackerStore.editTracker(id: id, oldCategory: oldCategory, newCategory: TrackerCategory.categoryName, trackerEdit: TrackerCategory.tracker[0])
+    }
 }
