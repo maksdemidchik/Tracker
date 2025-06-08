@@ -27,7 +27,6 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
     private var placeholderSearchBar = false
     
     private var name = ""
-    
     private var moreTwoSymbol = false
     
     private var selectedFilterCategory: String {
@@ -128,6 +127,7 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         trackersAfterFilters(selectedFilterCategory)
         completedTrackers = trackerStore.getCompletedTrackers()
         trackerCategoryStore.delegate = self
+        placeholderSearchBar = false
         
     }
     
@@ -153,6 +153,7 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
     @objc private func changeDate(_ sender: UIDatePicker){
         let date = sender.date
         actionWhenChangingTheDate(date: date)
+        placeholderSearchBar = false
         trackersAfterFilters(selectedFilterCategory)
     }
     
@@ -380,6 +381,7 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
             }
             isHiddenCollectionView(count: count)
             if !placeholderSearchBar{
+                print(count)
                 placeholderSearchBar = count > 0
             }
         }
