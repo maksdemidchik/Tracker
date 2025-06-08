@@ -379,6 +379,9 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
                 ifTheFilterCategoryCompletedOrUnCompleted(completedOrUnCompleted: selectedFilterCategory)
             }
             isHiddenCollectionView(count: count)
+            if !placeholderSearchBar{
+                placeholderSearchBar = count > 0
+            }
         }
         else{
             selectedFilterCategory = filterCategories[0]
@@ -510,8 +513,9 @@ extension TrackersViewController: UISearchBarDelegate {
         if let text = searchBar.text {
             searchBarText = text
             if searchBarText.count == 1 && !moreTwoSymbol{
-                placeholderSearchBar = currentCategories.count > 0
-
+                if !placeholderSearchBar{
+                    placeholderSearchBar = currentCategories.count > 0
+                }
             }
             else if searchBarText.count == 2{
                 moreTwoSymbol = true
@@ -519,7 +523,7 @@ extension TrackersViewController: UISearchBarDelegate {
             else if searchBarText.count == 0{
                 placeholderSearchBar = false
             }
-            setCurrentDayCollections()
+            trackersAfterFilters(selectedFilterCategory)
         }
         
     }
@@ -528,7 +532,7 @@ extension TrackersViewController: UISearchBarDelegate {
         searchBarText = ""
         moreTwoSymbol = false
         placeholderSearchBar = false
-        setCurrentDayCollections()
+        trackersAfterFilters(selectedFilterCategory)
     }
     
 }
@@ -547,7 +551,12 @@ extension TrackersViewController:TrackerStoreDelegate{
             setCurrentDayCollections()
         }
         else{
-            collectionView.reloadData()
+            if selectedFilterCategory == filterCategories[0] || selectedFilterCategory == filterCategories[1]{
+                collectionView.reloadData()
+            }
+            else{
+                trackersAfterFilters(selectedFilterCategory)
+            }
         }
     }
     
