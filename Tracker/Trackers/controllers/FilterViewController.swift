@@ -43,7 +43,6 @@ final class FilterViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
         self.delegate = delegate
         currentFilterCategory = filterCategory
-        print(filterCategory)
         setUI()
     }
     

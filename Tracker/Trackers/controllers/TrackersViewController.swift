@@ -126,7 +126,6 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         categories = trackerCategoryStore.getTracker()
         trackerStore.delegate = self
         trackersAfterFilters(selectedFilterCategory)
-        print(selectedFilterCategory)
         completedTrackers = trackerStore.getCompletedTrackers()
         trackerCategoryStore.delegate = self
         
@@ -354,7 +353,6 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         let bool = completedOrUnCompleted == filterCategories[2] ? true : false
         for i in 0..<currentCategories.count{
             var trackers: [Tracker] = []
-            print(bool)
             for z in 0..<currentCategories[i].tracker.count{
                 if isComplete(id: currentCategories[i].tracker[z].id) == bool{
                     trackers.append(currentCategories[i].tracker[z])
@@ -380,15 +378,14 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
             else{
                 ifTheFilterCategoryCompletedOrUnCompleted(completedOrUnCompleted: selectedFilterCategory)
             }
+            isHiddenCollectionView(count: count)
         }
         else{
             selectedFilterCategory = filterCategories[0]
             dataPicker.date = Date()
             actionWhenChangingTheDate(date: Date())
             setCurrentDayCollections()
-            print(1)
         }
-        isHiddenCollectionView(count: count)
         
     }
     

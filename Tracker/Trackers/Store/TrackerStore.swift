@@ -64,7 +64,7 @@ final class TrackerStore: NSObject{
                     }
                     tracker.schedule = trackerEdit.schedule as NSArray
                     tracker.category = trackerCategoryStore.fetchCategory(string: newCategory)
-                    print(trackerEdit.schedule)
+                    
                     if context.hasChanges{
                         try? context.save()
                     }
