@@ -32,10 +32,13 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         return searchBar
     }()
     
+    private let analytics = AnalyticsService.shared
+    
     private let collectionView :UICollectionView = {
         let collectionView = UICollectionView(frame: .infinite, collectionViewLayout: UICollectionViewFlowLayout())
         collectionView.register(CollectionViewCellForTrackers.self, forCellWithReuseIdentifier: "CollectionTrackerCell")
         collectionView.register(HeadersCollectionViewCellForTrackers.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "Header")
+        collectionView.alwaysBounceVertical = true
         return collectionView
     }()
     
@@ -83,6 +86,10 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
     
     private lazy var trackerCategoryStore = TrackerCategoryStore()
     
+    override func viewDidAppear(_ animated: Bool) {
+        analytics.reportEvent("open", parameters: ["screen" : "Main"])
+        super.viewDidAppear(animated)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -94,7 +101,13 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         trackerCategoryStore.delegate = self
     }
     
+    override func viewDidDisappear(_ animated: Bool) {
+        analytics.reportEvent("close", parameters: ["screen" : "Main"])
+        super.viewDidDisappear(animated)
+    }
+    
     @objc private func plusButtonAction(){
+        analytics.reportEvent("click", parameters: ["screen" : "Main", "item": "add_track"])
         let vc = ChoosingCategoryOrHabit()
         vc.delegate = self
         let vc1 = UINavigationController(rootViewController: vc)
@@ -348,6 +361,7 @@ extension TrackersViewController: TrackersViewControllerDelegate {
 
 extension TrackersViewController: CollectionViewCellForTrackersDelegate {
     func editTracker(id: UUID) {
+        analytics.reportEvent("click", parameters: ["screen" : "Main", "item": "edit"])
         let tracker = trackerCategoryStore.getTrackerAndCategoryName(id: id)
         let vc = EditTrackerViewController(tracker: tracker,delegate: self,count:countIfCompleted(id: id))
         let vc1 = UINavigationController(rootViewController: vc)
@@ -361,6 +375,7 @@ extension TrackersViewController: CollectionViewCellForTrackersDelegate {
     }
     
     func deleteTrecker(id: UUID) {
+        analytics.reportEvent("click", parameters: ["screen" : "Main", "item": "delete"])
         let alertText = NSLocalizedString("textDeleteAlert", comment: "textDeleteAlert")
         let alert = UIAlertController(title: alertText, message: nil, preferredStyle: .actionSheet)
         let deleteText = NSLocalizedString("delete", comment: "delete")
@@ -376,6 +391,7 @@ extension TrackersViewController: CollectionViewCellForTrackersDelegate {
     }
     
     func didTapButton(id: UUID) {
+        analytics.reportEvent("click", parameters: ["screen" : "Main", "item": "track"])
         if idSameDate(date: todayDate) || todayDate>currentDate{
             trackerStore.addOrDeleteTrackerRecord(id: id,date: currentDate,isComplete:isComplete(id: id))
         }

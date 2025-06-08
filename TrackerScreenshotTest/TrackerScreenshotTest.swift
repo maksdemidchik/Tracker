@@ -18,5 +18,5 @@ final class TrackerScreenshotTest: XCTestCase {
         let vc = ChoosingCategoryOrHabit()
         assertSnapshot(matching: vc, as: .image)
     }
-    //cкриншот делал на iPhone 16 pro
+    //cкриншот делал на iPhone 16 pro, белой темы, язык русский,трекеров нету на момент скриншота
 }

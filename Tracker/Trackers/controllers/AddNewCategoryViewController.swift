@@ -3,7 +3,6 @@
 //  Tracker
 //
 //  Created by Maxim on 30.05.2025.
-//
 
 import UIKit
 
