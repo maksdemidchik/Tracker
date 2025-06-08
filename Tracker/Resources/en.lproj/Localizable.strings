@@ -56,3 +56,8 @@
 "trackersCompleted" = "Trackers completed";
 "textPlaceholderStatistik" = "There is nothing to analyze yet";
 "placeholderSearchBar" = "Nothing found";
+"allTrackers" = "All trackers";
+"trackersForToday" = "Trackers for today";
+"completed" = "Completed";
+"notCompleted" = "Not completed";
+"filters" = "Filters";

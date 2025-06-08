@@ -89,17 +89,13 @@ final class EditTrackerViewController: UIViewController {
         let dayText = String.localizedStringWithFormat(NSLocalizedString("numberOfdays", comment: "dayCountCompleted"), count)
         super.init(nibName: nil, bundle: nil)
         dataCountLabel.text = dayText
+        setUI()
+        shared.setNilIndexPath()
+        shared.deletedWarning()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setUI()
-        shared.setNilIndexPath()
-        shared.deletedWarning()
     }
     
     @objc private func cancelAction(){
