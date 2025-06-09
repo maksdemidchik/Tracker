@@ -46,7 +46,6 @@ final class TrackerCategoryStore: NSObject {
             category.categoryName = name
             category.trackers = NSSet(array: [])
             nameCategories.append(name)
-            print(3)
             if context.hasChanges{
                 try? context.save()
             }
@@ -55,21 +54,53 @@ final class TrackerCategoryStore: NSObject {
     
     func getTracker()->[TrackerCategory]{
         var newCategoryTrackers: [TrackerCategory] = []
+        var pinnedCategories: [TrackerCategory] = []
         if  let categories = fetchResultsController.fetchedObjects{
+            var trackerPinned: [Tracker] = []
             for currentCategories in 0..<categories.count{
                 if let tracker = categories[currentCategories].trackers as? Set<TrackerCoreData>, tracker.count > 0,let categoryName = categories[currentCategories].categoryName {
                     var trackers: [Tracker] = []
                     for category in tracker {
                         if let id = category.id,let color = category.color, let name = category.name, let emoji = category.emoji, let schedule = category.schedule as? Array<Int>,let date = category.dateOfAddition{
-                            trackers.append(Tracker(id: id, color: colorMarshalling.color(from: color), name: name, emoji: emoji, schedule: schedule, dateOfAddition: date))
+                            let pinned = category.isItPinned
+                            if pinned == true{
+                                trackerPinned.append(Tracker(id: id, color: colorMarshalling.color(from: color), name: name, emoji: emoji, schedule: schedule, dateOfAddition: date, isItPinned: pinned))
+                            }
+                            else{
+                                trackers.append(Tracker(id: id, color: colorMarshalling.color(from: color), name: name, emoji: emoji, schedule: schedule, dateOfAddition: date, isItPinned: pinned))
+                            }
                         }
                     }
                     let newCategoryTracker = TrackerCategory(categoryName: categoryName, tracker: trackers)
                     newCategoryTrackers.append(newCategoryTracker)
                 }
             }
+            let text = NSLocalizedString("pinned", comment: "pinned")
+            let newPinnedCategoryTracker = TrackerCategory(categoryName: text, tracker: trackerPinned)
+            pinnedCategories.append(newPinnedCategoryTracker)
         }
+        newCategoryTrackers = pinnedCategories + newCategoryTrackers
         return newCategoryTrackers
+    }
+    
+    func getTrackerAndCategoryName(id:UUID) -> TrackerCategory{
+        var trackerCategory: [TrackerCategory] = []
+        if  let categories = fetchResultsController.fetchedObjects{
+            for currentCategories in 0..<categories.count{
+                if let trackers = categories[currentCategories].trackers as? Set<TrackerCoreData>{
+                    for tracker in trackers{
+                        if tracker.id == id{
+                            if let categoryName = categories[currentCategories].categoryName,let color = tracker.color, let name = tracker.name, let emoji = tracker.emoji, let schedule = tracker.schedule as? Array<Int>,let date = tracker.dateOfAddition{
+                                let newTracker = Tracker(id: id, color: colorMarshalling.color(from: color), name: name, emoji: emoji, schedule: schedule, dateOfAddition: date, isItPinned: tracker.isItPinned)
+                                trackerCategory.append(TrackerCategory(categoryName: categoryName, tracker: [newTracker]))
+                                                       return trackerCategory[0]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return trackerCategory[0]
     }
     
     func fetchCategory(string: String) -> TrackerCategoryCoreData?{

@@ -15,13 +15,32 @@ protocol TrackersViewControllerDelegate: AnyObject {
 final class TrackersViewController: UIViewController,  UINavigationControllerDelegate {
     private var currentDate: Date = Date()
     
+    private lazy var filterCategories: [String] = [
+        NSLocalizedString("allTrackers", comment: "allTrackers"),
+        NSLocalizedString("trackersForToday", comment: "trackersForToday"),
+        NSLocalizedString("completed", comment: "completed"),
+        NSLocalizedString("notCompleted", comment: "notCompleted")
+    ]
+    
     private var todayDate: Date = Date()
     
+    private var placeholderSearchBar = false
+    
     private var name = ""
+    private var moreTwoSymbol = false
+    
+    private var selectedFilterCategory: String {
+        get{
+            UserDefaults.standard.string(forKey: "selectedFilterCategory") ?? filterCategories[0]
+        }
+        set{
+            UserDefaults.standard.set(newValue, forKey: "selectedFilterCategory")
+        }
+    }
     
     private var categories: [TrackerCategory] = []
     
-    private var currentcCategories: [TrackerCategory] = []
+    private var currentCategories: [TrackerCategory] = []
     
     private var completedTrackers: [TrackerRecord] = []
     
@@ -32,23 +51,40 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         return searchBar
     }()
     
+    private let analytics = AnalyticsService.shared
+    
     private let collectionView :UICollectionView = {
         let collectionView = UICollectionView(frame: .infinite, collectionViewLayout: UICollectionViewFlowLayout())
         collectionView.register(CollectionViewCellForTrackers.self, forCellWithReuseIdentifier: "CollectionTrackerCell")
         collectionView.register(HeadersCollectionViewCellForTrackers.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "Header")
+        collectionView.alwaysBounceVertical = true
         return collectionView
+    }()
+    
+    private let filterButton: UIButton = {
+        let button = UIButton()
+        button.setTitle(NSLocalizedString("filters", comment: "filters"), for: .normal)
+        button.layer.masksToBounds = true
+        button.layer.cornerRadius = 16
+        button.backgroundColor = .blueYP
+        return button
     }()
     
     private let dataPicker: UIDatePicker = {
         let dataPicker = UIDatePicker()
         dataPicker.datePickerMode = .date
         dataPicker.preferredDatePickerStyle = .compact
+        dataPicker.backgroundColor = .white
+        dataPicker.layer.cornerRadius = 8
+        dataPicker.layer.masksToBounds = true
+        dataPicker.overrideUserInterfaceStyle = .light
         return dataPicker
     }()
     
     private let plugText : UILabel = {
         let label = UILabel()
-        label.text = "Что будем отслеживать?"
+        let text = NSLocalizedString("textPlaceholder", comment: "Placeholder text")
+        label.text = text
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.textColor = .blackYP
         label.textAlignment = .center
@@ -78,31 +114,47 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
     
     private lazy var trackerCategoryStore = TrackerCategoryStore()
     
+    override func viewDidAppear(_ animated: Bool) {
+        analytics.reportEvent("open", parameters: ["screen" : "Main"])
+        super.viewDidAppear(animated)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
         categories = trackerCategoryStore.getTracker()
         trackerStore.delegate = self
-        setCurrentDayCollections()
+        trackersAfterFilters(selectedFilterCategory)
         completedTrackers = trackerStore.getCompletedTrackers()
         trackerCategoryStore.delegate = self
+        placeholderSearchBar = false
+        
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        analytics.reportEvent("close", parameters: ["screen" : "Main"])
+        super.viewDidDisappear(animated)
     }
     
     @objc private func plusButtonAction(){
+        analytics.reportEvent("click", parameters: ["screen" : "Main", "item": "add_track"])
         let vc = ChoosingCategoryOrHabit()
         vc.delegate = self
+        let vc1 = UINavigationController(rootViewController: vc)
+        present(vc1,animated: true)
+    }
+    @objc private func filterButtonAction(){
+        analytics.reportEvent("click", parameters: ["screen" : "Main", "item": "filter"])
+        let vc = FilterViewController(filterCategory: selectedFilterCategory, delegate: self)
         let vc1 = UINavigationController(rootViewController: vc)
         present(vc1,animated: true)
     }
     
     @objc private func changeDate(_ sender: UIDatePicker){
         let date = sender.date
-        let weekdayInt = Calendar.current.component(.weekday, from: date)
-        selectedDayInt = weekdayInt
-        currentDate = date
-        setCurrentDayCollections()
-        collectionView.reloadData()
+        actionWhenChangingTheDate(date: date)
+        placeholderSearchBar = false
+        trackersAfterFilters(selectedFilterCategory)
     }
     
     private func setUpSearchAndPlusButtonAndDataPickerUI(){
@@ -110,14 +162,16 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         plusButton1.tintColor = .blackYP
         
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.navigationBar.topItem?.title = "Трекеры"
+        let textTracker = NSLocalizedString("trackerText", comment: "tracker")
+        navigationController?.navigationBar.topItem?.title = textTracker
         navigationController?.navigationBar.topItem?.leftBarButtonItem = plusButton1
         navigationController?.navigationBar.topItem?.rightBarButtonItem = UIBarButtonItem(customView: dataPicker)
         dataPicker.addTarget(self, action: #selector(changeDate), for: .valueChanged)
         navigationController?.navigationBar.backgroundColor = .whiteYP
         
+        let searchText = NSLocalizedString("searchText", comment: "search")
         navigationController?.navigationBar.topItem?.searchController = searchBar
-        searchBar.searchBar.placeholder = "Поиск"
+        searchBar.searchBar.placeholder = searchText
         searchBar.searchBar.delegate = self
     }
     
@@ -130,6 +184,17 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
         collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        collectionView.backgroundColor = .whiteYP
+    }
+    
+    private func setFilterButton(){
+        filterButton.translatesAutoresizingMaskIntoConstraints = false
+        filterButton.addTarget(self, action: #selector(filterButtonAction), for: .touchUpInside)
+        view.addSubview(filterButton)
+        filterButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16).isActive = true
+        filterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        filterButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        filterButton.widthAnchor.constraint(equalToConstant: 114).isActive = true
     }
     
     private func setUpPlaceholder(){
@@ -151,11 +216,17 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         setUpPlaceholder()
         setUpSearchAndPlusButtonAndDataPickerUI()
         setCollectionView()
-        collectionView.isHidden = currentcCategories.count == 0
+        setFilterButton()
     }
     
     private func setCurrentDayCollections(){
-        currentcCategories = []
+        searchCurrentDayCategories()
+        collectionView.reloadData()
+        isHiddenCollectionView(count: currentCategories.count)
+    }
+
+    private func searchCurrentDayCategories(){
+        currentCategories = []
         var x1=0
         for i in 0..<categories.count {
             var trackerList : [Tracker] = []
@@ -166,22 +237,22 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
                         trackerList.append(categories[i].tracker[z])
                         let newCategory = TrackerCategory(categoryName:categories[i].categoryName , tracker: trackerList)
                         if check == 0 {
-                            currentcCategories.append(newCategory)
+                            currentCategories.append(newCategory)
                         }
                         else{
-                            currentcCategories[x1] = newCategory
+                            currentCategories[x1] = newCategory
                         }
                         check+=1
                     }
                     else if categories[i].tracker[z].schedule[0] == 0 {
-                        let tracker = Tracker(id: categories[i].tracker[z].id, color: categories[i].tracker[z].color, name: categories[i].tracker[z].name, emoji: categories[i].tracker[z].emoji, schedule: [selectedDayInt], dateOfAddition: Date())
+                        let tracker = Tracker(id: categories[i].tracker[z].id, color: categories[i].tracker[z].color, name: categories[i].tracker[z].name, emoji: categories[i].tracker[z].emoji, schedule: [selectedDayInt], dateOfAddition: Date(), isItPinned: false)
                         trackerList.append(tracker)
                         let newCategory = TrackerCategory(categoryName:categories[i].categoryName , tracker: trackerList)
                         if check == 0 {
-                            currentcCategories.append(newCategory)
+                            currentCategories.append(newCategory)
                         }
                         else{
-                            currentcCategories[x1] = newCategory
+                            currentCategories[x1] = newCategory
                         }
                         check+=1
                     }
@@ -191,22 +262,32 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
                 x1+=1
             }
         }
-        collectionView.reloadData()
-        collectionView.isHidden = x1 == 0
+    }
+    
+    private func isHiddenCollectionView(count:Int){
+        collectionView.isHidden = currentCategories.count == 0
+        filterButton.isHidden = count == 0
+        let nameImage = filterButton.isHidden == false || placeholderSearchBar == true  ? "placeholder SearchBar" : "placeholder"
+        let textPlaceholder = filterButton.isHidden == false || placeholderSearchBar == true ? NSLocalizedString("placeholderSearchBar", comment: "Placeholder text") : NSLocalizedString("textPlaceholder", comment: "Placeholder text")
+        imagePlaceholder.image = UIImage(named: nameImage)
+        plugText.text = textPlaceholder
     }
     
     private func configCell(cell: CollectionViewCellForTrackers,indexPath: IndexPath){
-        let id = currentcCategories[indexPath.section].tracker[indexPath.row].id
-        cell.emojiLabel.text = currentcCategories[indexPath.section].tracker[indexPath.row].emoji
-        cell.namesTrackers.text = currentcCategories[indexPath.section].tracker[indexPath.row].name
-        cell.nameAndEmojiView.backgroundColor = currentcCategories[indexPath.section].tracker[indexPath.row].color
-        cell.button.backgroundColor = currentcCategories[indexPath.section].tracker[indexPath.row].color
-        cell.color = currentcCategories[indexPath.section].tracker[indexPath.row].color
+        let id = currentCategories[indexPath.section].tracker[indexPath.row].id
+        cell.emojiLabel.text = currentCategories[indexPath.section].tracker[indexPath.row].emoji
+        cell.namesTrackers.text = currentCategories[indexPath.section].tracker[indexPath.row].name
+        cell.nameAndEmojiView.backgroundColor = currentCategories[indexPath.section].tracker[indexPath.row].color
+        cell.button.backgroundColor = currentCategories[indexPath.section].tracker[indexPath.row].color
+        cell.color = currentCategories[indexPath.section].tracker[indexPath.row].color
         cell.setImageButton(isCompleted: isComplete(id: id))
         cell.trackerID = id
         let number = countIfCompleted(id: id)
-        cell.setDays(number: number)
+        let dayText = String.localizedStringWithFormat(NSLocalizedString("numberOfdays", comment: "dayCountCompleted"), number)
+        cell.daylabel.text = dayText
         cell.delegate = self
+        cell.isItPin = currentCategories[indexPath.section].tracker[indexPath.row].isItPinned
+        cell.pinEmojiView.isHidden = !currentCategories[indexPath.section].tracker[indexPath.row].isItPinned
     }
     
     private func isComplete(id:UUID) -> Bool {
@@ -231,14 +312,97 @@ final class TrackersViewController: UIViewController,  UINavigationControllerDel
         }
         return count
     }
+    
+    private func editingTheTracker(id:UUID,category:String,trackerCategory:TrackerCategory){
+        var indexCategory = -1
+        var indexTracker = -1
+        let categoryIsSame = category == trackerCategory.categoryName
+        for i in 0..<currentCategories.count {
+            var trackers = currentCategories[i].tracker
+            for j in 0..<currentCategories[i].tracker.count {
+                if currentCategories[i].tracker[j].id == id && trackerCategory.categoryName == category {
+                    trackers.remove(at: j)
+                    trackers.insert(trackerCategory.tracker[0], at: j)
+                    currentCategories[i] = TrackerCategory(categoryName: category, tracker: trackers)
+                    return
+                }
+                else if currentCategories[i].tracker[j].id == id && trackerCategory.categoryName != category {
+                    indexCategory = i
+                    indexTracker = j
+                }
+                else if currentCategories[i].categoryName == trackerCategory.categoryName{
+                    let newTrackers = currentCategories[i].tracker
+                    currentCategories[i] = TrackerCategory(categoryName: trackerCategory.categoryName, tracker: newTrackers+trackerCategory.tracker)
+                }
+            }
+        }
+        if categoryIsSame == false{
+            var trackers = currentCategories[indexCategory].tracker
+            trackers.remove(at: indexTracker)
+            currentCategories[indexCategory] = TrackerCategory(categoryName: category, tracker: trackers)
+        }
+    }
+    
+    private func actionWhenChangingTheDate(date:Date){
+        let weekdayInt = Calendar.current.component(.weekday, from: date)
+        selectedDayInt = weekdayInt
+        currentDate = date
+    }
+    
+    private func ifTheFilterCategoryCompletedOrUnCompleted(completedOrUnCompleted:String){
+        var newCurrentcCategories: [TrackerCategory] = []
+        let bool = completedOrUnCompleted == filterCategories[2] ? true : false
+        for i in 0..<currentCategories.count{
+            var trackers: [Tracker] = []
+            for z in 0..<currentCategories[i].tracker.count{
+                if isComplete(id: currentCategories[i].tracker[z].id) == bool{
+                    trackers.append(currentCategories[i].tracker[z])
+                }
+            }
+            if trackers.count > 0 {
+                let NewTrackerCategory = TrackerCategory(categoryName: currentCategories[i].categoryName, tracker: trackers)
+                newCurrentcCategories.append(NewTrackerCategory)
+            }
+        }
+        currentCategories = newCurrentcCategories
+        collectionView.reloadData()
+    }
+    
+    private func trackersAfterFilters(_ filterCategory: String){
+        searchCurrentDayCategories()
+        let count = currentCategories.count
+        if filterCategory != filterCategories[1]{
+            selectedFilterCategory = filterCategory
+            if selectedFilterCategory == filterCategories[0]{
+                setCurrentDayCollections()
+            }
+            else{
+                ifTheFilterCategoryCompletedOrUnCompleted(completedOrUnCompleted: selectedFilterCategory)
+            }
+            isHiddenCollectionView(count: count)
+            if !placeholderSearchBar{
+                print(count)
+                placeholderSearchBar = count > 0
+            }
+        }
+        else{
+            selectedFilterCategory = filterCategories[0]
+            dataPicker.date = Date()
+            actionWhenChangingTheDate(date: Date())
+            setCurrentDayCollections()
+        }
+        
+    }
+    
 }
 
 extension TrackersViewController: UICollectionViewDataSource {
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if section == 0 && currentcCategories.count == 0 {
+        if section == 0 && currentCategories.count == 0 {
             return 0
         }
-        return currentcCategories[section].tracker.count
+        return currentCategories[section].tracker.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -251,14 +415,14 @@ extension TrackersViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath) as? HeadersCollectionViewCellForTrackers {
-            header.titleLabel.text = currentcCategories[indexPath.section].categoryName
+            header.titleLabel.text = currentCategories[indexPath.section].categoryName
             return header
         }
         return UICollectionReusableView()
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return currentcCategories.count
+        return currentCategories.count
     }
 }
 
@@ -284,6 +448,9 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
         layout collectionViewLayout: UICollectionViewLayout,
         insetForSectionAt section: Int
     ) -> UIEdgeInsets {
+        if section == currentCategories.count-1{
+            return UIEdgeInsets(top: 0, left: 16, bottom: 66, right: 16)
+        }
         return UIEdgeInsets(top: 0, left: 16, bottom: 16, right: 16)
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
@@ -303,7 +470,39 @@ extension TrackersViewController: TrackersViewControllerDelegate {
 }
 
 extension TrackersViewController: CollectionViewCellForTrackersDelegate {
+    func editTracker(id: UUID) {
+        analytics.reportEvent("click", parameters: ["screen" : "Main", "item": "edit"])
+        let tracker = trackerCategoryStore.getTrackerAndCategoryName(id: id)
+        let vc = EditTrackerViewController(tracker: tracker,delegate: self,count:countIfCompleted(id: id))
+        let vc1 = UINavigationController(rootViewController: vc)
+        present(vc1,animated: true)
+    }
+    
+    func pinnedOrUnpinned(id: UUID) {
+        trackerStore.trackerPinnedOrUnpinned(id: id)
+        categories = trackerCategoryStore.getTracker()
+        setCurrentDayCollections()
+    }
+    
+    func deleteTrecker(id: UUID) {
+        analytics.reportEvent("click", parameters: ["screen" : "Main", "item": "delete"])
+        let alertText = NSLocalizedString("textDeleteAlert", comment: "textDeleteAlert")
+        let alert = UIAlertController(title: alertText, message: nil, preferredStyle: .actionSheet)
+        let deleteText = NSLocalizedString("delete", comment: "delete")
+        let delete = UIAlertAction(title: deleteText, style: .destructive){[weak self] _ in
+            guard let self = self else { return }
+            self.trackerStore.deleteTracker(id: id)
+            
+        }
+        let cancelText = NSLocalizedString("cancel", comment: "cancel")
+        let cancel = UIAlertAction(title: cancelText, style: .cancel){ _ in }
+        alert.addAction(delete)
+        alert.addAction(cancel)
+        present(alert, animated: true)
+    }
+    
     func didTapButton(id: UUID) {
+        analytics.reportEvent("click", parameters: ["screen" : "Main", "item": "track"])
         if idSameDate(date: todayDate) || todayDate>currentDate{
             trackerStore.addOrDeleteTrackerRecord(id: id,date: currentDate,isComplete:isComplete(id: id))
         }
@@ -315,14 +514,27 @@ extension TrackersViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if let text = searchBar.text {
             searchBarText = text
-            setCurrentDayCollections()
+            if searchBarText.count == 1 && !moreTwoSymbol{
+                if !placeholderSearchBar{
+                    placeholderSearchBar = currentCategories.count > 0
+                }
+            }
+            else if searchBarText.count == 2{
+                moreTwoSymbol = true
+            }
+            else if searchBarText.count == 0{
+                placeholderSearchBar = false
+            }
+            trackersAfterFilters(selectedFilterCategory)
         }
         
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBarText = ""
-        setCurrentDayCollections()
+        moreTwoSymbol = false
+        placeholderSearchBar = false
+        trackersAfterFilters(selectedFilterCategory)
     }
     
 }
@@ -333,9 +545,37 @@ extension TrackersViewController: TrackerCategoryStoreDelegate{
     }
 }
 extension TrackersViewController:TrackerStoreDelegate{
-    func changeRecordValue(completedTrackers: [TrackerRecord]) {
+    
+    func changeRecordValue(completedTrackers: [TrackerRecord],changeSchedule:Bool) {
         self.completedTrackers = completedTrackers
-        collectionView.reloadData()
+        categories = trackerCategoryStore.getTracker()
+        if changeSchedule{
+            setCurrentDayCollections()
+        }
+        else{
+            if selectedFilterCategory == filterCategories[0] || selectedFilterCategory == filterCategories[1]{
+                collectionView.reloadData()
+            }
+            else{
+                trackersAfterFilters(selectedFilterCategory)
+            }
+        }
+    }
+    
+}
+
+extension TrackersViewController: EditTrackerViewControllerDelegate{
+    
+    func editNewTracker(id: UUID,oldCategory:String,TrackerCategory:TrackerCategory) {
+        editingTheTracker(id: id, category: oldCategory, trackerCategory: TrackerCategory)
+        trackerStore.editTracker(id: id, oldCategory: oldCategory, newCategory: TrackerCategory.categoryName, trackerEdit: TrackerCategory.tracker[0])
+    }
+}
+
+extension TrackersViewController: FilterViewControllerDelegate {
+    
+    func didSelectFilterCategory(_ filterCategory: String) {
+        trackersAfterFilters(filterCategory)
     }
     
 }

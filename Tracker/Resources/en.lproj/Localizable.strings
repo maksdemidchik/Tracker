@@ -1,0 +1,63 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Maxim on 05.06.2025.
+  
+*/
+"textPlaceholder" = "What will we track?";
+"searchText" = "Search";
+"trackerText" = "Trackers";
+"statistikText" = "Statistics";
+"OnboardingTextOne" = "Track only what you want";
+"OnboardingTextTwo" = "Even if it's not liters of water and yoga";
+"ButtonOnboarding" =  "This is technology!";
+"CreateTrackerText" = "Creating a tracker";
+"buttomHabbitText" = "Habit";
+"buttomNewIrregularEventText" = "Irregular event";
+"ScheduleText" = "Schedule" ;
+"CategoryText" = "Category";
+"NewHabitText" = "New Habit";
+"NewIrregularEvent" = "New irregular event";
+"colorText" = "Color";
+"trackerTextFieldPlaceholder" = "Enter tracker name";
+"warningLabelText" = "38 character limit";
+"cancelText" = "Cancel";
+"createText" = "Create";
+"monday" = "Monday";
+"tuesday" = "Tuesday";
+"wednesday" = "Wednesday"; 
+"thursday" = "Thursday";
+"friday" = "Friday";
+"saturday" = "Saturday";
+"sunday" = "Sunday";
+"readyText" = "Ready";
+"mon" = "Mon";
+"tue" = "Tue";
+"wed" = "Wed";
+"thu" = "Thu";
+"fri" = "Fri";
+"sat" = "Sat";
+"sun" = "Sun";
+"everyDay" = "Every day";
+"categoryTextFieldPlaceholder" = "Enter category name";
+"newCategory"  = "New category";
+"placeholderCategoryText" = "Event habits can be\n united by meaning";
+"addCategory" = "Add category";
+"pinned" = "Pinned";
+"pin" = "Pin";
+"unpin" = "Unpin";
+"delete" = "Delete";
+"cancel" = "Cancel";
+"textDeleteAlert" = "Are you sure you want to delete the tracker?";
+"edit" = "Edit";
+"save" = "Save";
+"EditingHabit" = "Editing a Habit";
+"trackersCompleted" = "Trackers completed";
+"textPlaceholderStatistik" = "There is nothing to analyze yet";
+"placeholderSearchBar" = "Nothing found";
+"allTrackers" = "All trackers";
+"trackersForToday" = "Trackers for today";
+"completed" = "Completed";
+"notCompleted" = "Not completed";
+"filters" = "Filters";

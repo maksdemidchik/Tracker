@@ -14,6 +14,7 @@ struct Tracker{
     let emoji : String
     let schedule :  Array<Int>
     let dateOfAddition : Date
+    let isItPinned : Bool
 }
 
 struct TrackerCategory{

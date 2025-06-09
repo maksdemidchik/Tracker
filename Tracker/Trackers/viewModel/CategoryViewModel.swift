@@ -45,9 +45,11 @@ final class CategoryViewModel {
         delegate?.didNameCategory()
         categoryIsChoose?(true)
     }
-    
-    func checkNeedACheckmark(currentIndexPath: IndexPath) -> Bool {
-        return getCurrentIndexPath()?.row == currentIndexPath.row
+    func updatePreviousIndexPath(indexPath: IndexPath) {
+        service.setIndexPathPreviousIndexPathIfNeed(IndexPath: indexPath)
+    }
+    func checkNeedACheckmark(nameCategory: String) -> Bool {
+        return service.curruntCategory == nameCategory
     }
     
     func getCurrentIndexPath() -> IndexPath? {

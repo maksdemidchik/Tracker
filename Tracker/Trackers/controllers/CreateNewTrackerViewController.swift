@@ -7,7 +7,7 @@
 
 import UIKit
 
-class CreateNewTrackerViewController: UIViewController {
+final class CreateNewTrackerViewController: UIViewController {
     
     private let shared = CreateNewTrackerAndScheduleServices.shared
     
@@ -16,7 +16,8 @@ class CreateNewTrackerViewController: UIViewController {
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 16
         button.layer.borderColor = UIColor.systemRed.cgColor
-        button.setTitle("Отменить", for: .normal)
+        let text = NSLocalizedString("cancelText", comment: "cancelText")
+        button.setTitle(text, for: .normal)
         button.layer.borderWidth = 1
         button.backgroundColor = .whiteYP
         button.setTitleColor(.red, for: .normal)
@@ -27,8 +28,9 @@ class CreateNewTrackerViewController: UIViewController {
         let button = UIButton()
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 16
-        button.setTitle( "Создать", for: .normal)
-        button.tintColor = .whiteYP
+        let text = NSLocalizedString("createText", comment: "createText")
+        button.setTitle(text , for: .normal)
+        button.setTitleColor(.white, for: .normal)
         button.backgroundColor = .grayYP
         return button
     }()
@@ -65,7 +67,7 @@ class CreateNewTrackerViewController: UIViewController {
         guard let dataInt = delegate?.currentDateInt() else { return }
         guard let color = colorTracker else { return }
         let schedule = shared.numberOfDaysForDateInt.count > 0 ? shared.numberOfDaysForDateInt : [dataInt]
-        let newTracker = Tracker(id: UUID(),color: color, name: nameTracker, emoji: emojiTracker, schedule: schedule, dateOfAddition: Date())
+        let newTracker = Tracker(id: UUID(),color: color, name: nameTracker, emoji: emojiTracker, schedule: schedule, dateOfAddition: Date(), isItPinned: false)
         self.delegate?.dismissAndCreateCategory(tracker: newTracker, category: shared.curruntCategory)
         dismiss(animated: true)
     }
@@ -99,18 +101,21 @@ class CreateNewTrackerViewController: UIViewController {
         collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: cancelButton.topAnchor,constant: -16).isActive = true
+        collectionView.backgroundColor = .whiteYP
     }
     
     private func setUI(){
         setCancelButton()
         setCreateButton()
         setCollectionView()
-        view.backgroundColor = .white
+        view.backgroundColor = .whiteYP
         if shared.habitOrEvent == "Нерегулярное событие"{
-            navigationItem.title = "Новое нерегулярное событие"
+            let text = NSLocalizedString("NewHabitText", comment: "NewHabitText")
+            navigationItem.title = text
         }
         else{
-            navigationItem.title = "Новая привычка"
+            let text = NSLocalizedString("NewIrregularEvent", comment: "NewIrregularEvent")
+            navigationItem.title = text
         }
         navigationItem.hidesBackButton = true
     }
@@ -120,6 +125,7 @@ class CreateNewTrackerViewController: UIViewController {
         if nameTracker.count > 0 && emojiTracker.count > 0 && checkingIfThereIsASchedule && colorTracker != nil && shared.curruntCategory != ""{
             createButton.isEnabled = true
             createButton.backgroundColor = .blackYP
+            createButton.setTitleColor(.whiteYP, for: .normal)
         }
         else{
             createButtonIsNotActive()
@@ -175,18 +181,22 @@ extension CreateNewTrackerViewController: UICollectionViewDelegateFlowLayout {
         layout collectionViewLayout: UICollectionViewLayout,
         sizeForItemAt indexPath: IndexPath
     ) -> CGSize {
-        
+        let tableWithTwoElementsHeight: CGFloat = 150
+        let tableWithOneElementsHeightOrTextField: CGFloat = 75
+        let distanceBetweenTableViewAndCollectionView : CGFloat = 50
+        let distanceBetweenElements: CGFloat = 24
+        let warningHeight: CGFloat = 22
+        let distanceBetweenElementsCollectionViewAndButtonCancel : CGFloat = 16
         if shared.isWarning{
-            if shared.habitOrEvent == "Привычка" {
-                return CGSize(width: collectionView.bounds.width, height: 75 + 24 + 150 + 50 + (collectionView.bounds.width/6) * 3 + (collectionView.bounds.width/6) * 3 + 24 * 4 + 16 + 22)
+            if shared.habitOrEvent == "Привычка" ||  shared.habitOrEvent == "Edit" {
+                return CGSize(width: collectionView.bounds.width, height: tableWithOneElementsHeightOrTextField + distanceBetweenElements + tableWithTwoElementsHeight + distanceBetweenTableViewAndCollectionView + (collectionView.bounds.width/6) * 3 + (collectionView.bounds.width/6) * 3 + distanceBetweenElements * 4 + distanceBetweenElementsCollectionViewAndButtonCancel + warningHeight)
             }
-            return CGSize(width: collectionView.bounds.width, height: 75 + 24 + 75 + 50 + (collectionView.bounds.width/6) * 3 + (collectionView.bounds.width/6) * 3 + 24 * 4 + 16 + 22)
+            return CGSize(width: collectionView.bounds.width, height: tableWithOneElementsHeightOrTextField + distanceBetweenElements + tableWithOneElementsHeightOrTextField + distanceBetweenTableViewAndCollectionView + (collectionView.bounds.width/6) * 3 + (collectionView.bounds.width/6) * 3 + distanceBetweenElements * 4 + distanceBetweenElementsCollectionViewAndButtonCancel + warningHeight)
         }
-        if shared.habitOrEvent == "Привычка" {
-            return CGSize(width: collectionView.bounds.width, height: 75 + 24 + 150 + 50 + (collectionView.bounds.width/6) * 3 + (collectionView.bounds.width/6) * 3 + 24 * 4 + 16)
+        if shared.habitOrEvent == "Привычка" || shared.habitOrEvent == "Edit"{
+            return CGSize(width: collectionView.bounds.width, height: tableWithOneElementsHeightOrTextField + distanceBetweenElements + tableWithTwoElementsHeight + distanceBetweenTableViewAndCollectionView + (collectionView.bounds.width/6) * 3 + (collectionView.bounds.width/6) * 3 + distanceBetweenElements * 4 + distanceBetweenElementsCollectionViewAndButtonCancel)
         }
-        return CGSize(width: collectionView.bounds.width, height: 75 + 24 + 75 + 50 + (collectionView.bounds.width/6) * 3 + (collectionView.bounds.width/6) * 3 + 24 * 4 + 16)
-        
+        return CGSize(width: collectionView.bounds.width, height: tableWithOneElementsHeightOrTextField + distanceBetweenElements + tableWithOneElementsHeightOrTextField + distanceBetweenTableViewAndCollectionView + (collectionView.bounds.width/6) * 3 + (collectionView.bounds.width/6) * 3 + distanceBetweenElements * 4 + distanceBetweenElementsCollectionViewAndButtonCancel)
     }
     
     func collectionView(

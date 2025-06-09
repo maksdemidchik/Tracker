@@ -1,0 +1,63 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Maxim on 05.06.2025.
+  
+*/
+"textPlaceholder" = "Что будем отслеживать?";
+"searchText" = "Поиск";
+"trackerText" = "Трекеры";
+"statistikText" = "Cтатистика";
+"OnboardingTextOne" = "Отслеживайте только то, что хотите";
+"OnboardingTextTwo" = "Даже если это не литры воды и йога";
+"ButtonOnboarding" = "Вот это технологии!";
+"CreateTrackerText" = "Создание трекера";
+"buttomHabbitText" = "Привычка";
+"buttomNewIrregularEventText" = "Нерегулярное событие";
+"ScheduleText" = "Расписание";
+"CategoryText" = "Категория";
+"NewHabitText" = "Новая привычка";
+"NewIrregularEvent" = "Новое нерегулярное событие";
+"colorText" = "Цвет";
+"trackerTextFieldPlaceholder" = "Введите название трекера";
+"warningLabelText" = "Ограничение 38 символов";
+"cancelText" = "Отменить";
+"createText" = "Создать";
+"monday" = "Понедельник";
+"tuesday" = "Вторник";
+"wednesday" = "Среда"; 
+"thursday" = "Четверг";
+"friday" = "Пятница";
+"saturday" = "Суббота";
+"sunday" = "Воскресенье";
+"readyText" = "Готово";
+"mon" = "Пн";
+"tue" = "Вт";
+"wed" = "Ср";
+"thu" = "Чт";
+"fri" = "Пт";
+"sat" = "Сб";
+"sun" = "Вск";
+"everyDay" = "Каждый день";
+"categoryTextFieldPlaceholder" = "Введите название категории";
+"newCategory" = "Новая категория";
+"placeholderCategoryText" = "Привычки события можно\n объединить по смыслу";
+"addCategory" = "Добавить категорию";
+"pinned" = "Закрепленные";
+"pin" = "Закрепить";
+"unpin" = "Открепить";
+"delete" = "Удалить";
+"cancel" = "Отменить";
+"textDeleteAlert" = "Уверены что хотите удалить трекер?";
+"edit" = "Редактировать";
+"save" = "Сохранить";
+"EditingHabit" = "Редактирование привычки";
+"trackersCompleted" = "Трекеров завершено";
+"textPlaceholderStatistik" = "Анализировать пока нечего";
+"placeholderSearchBar" = "Ничего не найдено";
+"allTrackers" = "Все трекеры";
+"trackersForToday" = "Трекеры на сегодня";
+"completed" = "Завершенные";
+"notCompleted" = "Не завершенные";
+"filters" = "Фильтры";

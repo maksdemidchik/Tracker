@@ -7,7 +7,7 @@
 
 import UIKit
 
-class CategoryViewController: UIViewController {
+final class CategoryViewController: UIViewController {
     var viewModel : CategoryViewModel?
     
     private let tableView : UITableView = {
@@ -17,12 +17,16 @@ class CategoryViewController: UIViewController {
         tableView.layer.cornerRadius = 16
         tableView.tableHeaderView = UIView()
         tableView.rowHeight = 75
+        tableView.backgroundColor = .clear
+        tableView.separatorStyle = .singleLine
+        tableView.separatorColor = .lightGray
         return tableView
     }()
     
     private let plugText : UILabel = {
         let label = UILabel()
-        label.text = "Привычки события можно\n объединить по смыслу"
+        let text = NSLocalizedString("placeholderCategoryText", comment: "placeholderCategoryText")
+        label.text = text
         label.numberOfLines = 2
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.textColor = .blackYP
@@ -39,11 +43,12 @@ class CategoryViewController: UIViewController {
     
     private let addCategoryButton : UIButton = {
         let button = UIButton()
-        button.setTitle("Добавить категорию", for: .normal)
+        let text = NSLocalizedString("addCategory", comment: "addCategory")
+        button.setTitle(text, for: .normal)
         button.backgroundColor = .blackYP
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 16
-        button.tintColor = .whiteYP
+        button.setTitleColor(.whiteYP, for: .normal)
         return button
     }()
     
@@ -75,17 +80,13 @@ class CategoryViewController: UIViewController {
             guard let self = self else { return }
             if viewModel.getPreviousIndexPath() != nil,let indexPath = viewModel.getPreviousIndexPath() {
                 self.tableView.deselectRow(at: indexPath, animated: true)
-                guard let cell = self.tableView.cellForRow(at: indexPath) as? CategoryCell else {
-                    return
-                }
+                guard let cell = self.tableView.cellForRow(at: indexPath) as? CategoryCell else { return }
                 cell.checkMarkImageView.isHidden = true
             }
             
             if let indexPath = viewModel.getCurrentIndexPath(){
                 self.tableView.deselectRow(at: indexPath, animated: true)
-                guard let cell = self.tableView.cellForRow(at: indexPath) as? CategoryCell else {
-                    return
-                }
+                guard let cell = self.tableView.cellForRow(at: indexPath) as? CategoryCell else { return }
                 cell.checkMarkImageView.isHidden = false
             }
             
@@ -133,7 +134,8 @@ class CategoryViewController: UIViewController {
     
     private func setUI(){
         view.backgroundColor = .whiteYP
-        navigationItem.title = "Категория"
+        let text = NSLocalizedString("CategoryText", comment: "CategoryText")
+        navigationItem.title = text
         navigationItem.hidesBackButton = true
         setButton()
         setTableView()
@@ -144,7 +146,11 @@ class CategoryViewController: UIViewController {
     private func configCell(cell: CategoryCell,indexPath: IndexPath){
         guard let categories = viewModel?.getCategories() else { return }
         cell.categoryName.text = categories[indexPath.row]
-        cell.checkMarkImageView.isHidden = !(viewModel?.checkNeedACheckmark(currentIndexPath: indexPath) ?? false)
+        let shouldUseCheckmark: Bool = viewModel?.checkNeedACheckmark(nameCategory: categories[indexPath.row]) ?? false
+        cell.checkMarkImageView.isHidden = !shouldUseCheckmark
+        if viewModel?.getPreviousIndexPath() == nil && shouldUseCheckmark{
+            viewModel?.updatePreviousIndexPath(indexPath: indexPath)
+        }
         if indexPath.row == categories.count - 1 {
             cell.layer.masksToBounds = true
             cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: tableView.bounds.width)

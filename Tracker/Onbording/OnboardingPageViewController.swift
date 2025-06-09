@@ -13,11 +13,12 @@ final class OnboardingPageViewController: UIPageViewController  {
     
     lazy private var pages: [UIViewController] = {
         let firstOnboardingVC = OnboardingViewController()
-        firstOnboardingVC.textLabel.text = "Отслеживайте только то, что хотите"
+        let text1 = NSLocalizedString("OnboardingTextOne", comment: "1")
+        firstOnboardingVC.textLabel.text = text1
         firstOnboardingVC.imageOnboarding.image = UIImage(named: "1")
-        
+        let text2 = NSLocalizedString("OnboardingTextTwo", comment: "2")
         let secondOnboardingVC = OnboardingViewController()
-        secondOnboardingVC.textLabel.text = "Даже если это не литры воды и йога"
+        secondOnboardingVC.textLabel.text = text2
         secondOnboardingVC.imageOnboarding.image = UIImage(named: "2")
         
         positionYPageControl = firstOnboardingVC.BottomButtonY
@@ -30,6 +31,7 @@ final class OnboardingPageViewController: UIPageViewController  {
         pageControl.currentPage = 0
         
         pageControl.currentPageIndicatorTintColor = .blackYP
+        pageControl.overrideUserInterfaceStyle = .light
         pageControl.pageIndicatorTintColor = .placeholderText
         
         pageControl.translatesAutoresizingMaskIntoConstraints = false
@@ -78,16 +80,13 @@ extension OnboardingPageViewController:UIPageViewControllerDataSource{
         guard nextIndex < pages.count else {
             return pages.first
         }
-        
         return pages[nextIndex]
     }
-    
     
 }
 
 extension OnboardingPageViewController:UIPageViewControllerDelegate{
     func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
-        
         if let currentViewController = pageViewController.viewControllers?.first,
            let currentIndex = pages.firstIndex(of: currentViewController) {
             pageControl.currentPage = currentIndex

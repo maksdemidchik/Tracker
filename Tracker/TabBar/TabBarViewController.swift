@@ -17,7 +17,7 @@ final class TabBarViewController: UITabBarController {
     private func setLine(){
         let line = UIView()
         line.translatesAutoresizingMaskIntoConstraints = false
-        line.backgroundColor = .gray
+        line.backgroundColor = .line
         tabBar.addSubview(line)
         
         line.topAnchor.constraint(equalTo: tabBar.safeAreaLayoutGuide.topAnchor).isActive = true
@@ -29,11 +29,13 @@ final class TabBarViewController: UITabBarController {
     private func setTabBarViewControllerSettings(){
         let vc = TrackersViewController()
         let rootVc = UINavigationController(rootViewController: vc)
-        rootVc.tabBarItem = UITabBarItem(title: "Трекеры", image: UIImage(named: "Property 1=trackers"), tag: 0)
+        let trackerText = NSLocalizedString("trackerText", comment: "trackerText")
+        rootVc.tabBarItem = UITabBarItem(title: trackerText, image: UIImage(named: "Property 1=trackers"), tag: 0)
         let statistikViewController = StatistikViewController()
-        statistikViewController.tabBarItem = UITabBarItem(title: "Статистика", image: UIImage(named: "Property 1=stats"), tag: 0)
+        let statistikText = NSLocalizedString("statistikText", comment: "statistikText")
+        statistikViewController.tabBarItem = UITabBarItem(title: statistikText, image: UIImage(named: "Property 1=stats"), tag: 0)
         viewControllers = [rootVc, statistikViewController]
         setLine()
-    }   
+    }
     
 }
